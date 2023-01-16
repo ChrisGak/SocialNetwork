@@ -1,21 +1,17 @@
 package me.kristinasaigak.otus.handler
 
-import kotlinx.coroutines.reactive.collect
 import lombok.RequiredArgsConstructor
 import me.kristinasaigak.otus.model.User
 import me.kristinasaigak.otus.model.UserDto
 import me.kristinasaigak.otus.model.security.AuthRequest
 import me.kristinasaigak.otus.service.UserService
-import org.springframework.http.HttpHeaders
+import me.kristinasaigak.otus.utils.hash
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
-
 
 @Component
 @RequiredArgsConstructor
@@ -62,14 +58,13 @@ class UserHandler(
             .flatMap { authRequest ->
                 userService.findById(authRequest.id)
                     .flatMap { user ->
-                        if (user.password != authRequest.password) {
+                        if (user.password != hash(authRequest.password)) {
                             ServerResponse.badRequest().build()
                         } else {
                             ServerResponse
                                 .status(HttpStatus.OK)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                // .header(HttpHeaders.SET_COOKIE, "token=jwttoken")
-                                .bodyValue("Hi , you are just logged in as ${user.first_name}")
+                                .bodyValue("Hi, you are just logged in as ${user.first_name} ${user.second_name}")
                         }
                     }
                     .switchIfEmpty(

@@ -11,7 +11,7 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
             <column name="age" value="28"/>
             <column name="biography" value="Long story"/>
             <column name="city" value="Winterfell"/>
-            <column name="password" value="1234"/>
+            <column name="password" value="482b71f4816d1efac579c266c7c86735819da2ec83da21c084556b147ff6756d"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

@@ -1,12 +1,9 @@
 package me.kristinasaigak.otus.utils
 
-import me.kristinasaigak.otus.model.AuthenticatedUser
-import me.kristinasaigak.otus.model.User
-import org.springframework.security.core.userdetails.UserDetails
-
-//fun User.toAuthUser(): UserDetails {
-//    return AuthenticatedUser().apply {
-//        password: this.password
-//        username = "$first_name $second_name"
-//    }
-//}
+import java.security.MessageDigest
+fun hash(password: String): String {
+    val bytes = password.toByteArray()
+    val md = MessageDigest.getInstance("SHA-256")
+    val digest = md.digest(bytes)
+    return digest.fold("") { str, it -> str + "%02x".format(it) }
+}
