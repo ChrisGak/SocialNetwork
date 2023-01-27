@@ -16,11 +16,11 @@ data class User(
     @Column("age")
     var age: Int,
     @Column("biography")
-    var biography: String,
+    var biography: String? = null,
     @Column("city")
     var city: String,
     @Column("password")
-    var password: String
+    var password: String? = null
 )
 
 //    : UserDetails {

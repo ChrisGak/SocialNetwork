@@ -3,3 +3,7 @@ databaseChangeLog:
       file: db/changelog/create-users-schema.xml
   - include:
       file: db/changelog/init-user.xml
+  - include:
+      file: db/changelog/load-users.xml
+  - include:
+      file: db/changelog/init-index.xml
