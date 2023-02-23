@@ -1,15 +1,18 @@
 package me.kristinasaigak.otus.handler
 
 import lombok.RequiredArgsConstructor
-import me.kristinasaigak.otus.model.SearchUsersDto
-import me.kristinasaigak.otus.model.User
-import me.kristinasaigak.otus.model.UserDto
+import me.kristinasaigak.otus.model.api.SearchUsersDto
+import me.kristinasaigak.otus.model.api.UserDto
+import me.kristinasaigak.otus.model.entity.User
 import me.kristinasaigak.otus.model.security.AuthRequest
+import me.kristinasaigak.otus.model.security.AuthResponse
+import me.kristinasaigak.otus.service.JwtSigner
 import me.kristinasaigak.otus.service.UserService
 import me.kristinasaigak.otus.utils.hash
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseCookie
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -18,12 +21,13 @@ import reactor.core.publisher.Mono
 @Component
 @RequiredArgsConstructor
 class UserHandler(
-        private val userService: UserService
+        private val userService: UserService,
+        private val jwtSigner: JwtSigner
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun login(request: ServerRequest): Mono<ServerResponse?> {
+    fun login(request: ServerRequest): Mono<ServerResponse> {
         return request.bodyToMono(AuthRequest::class.java)
                 .flatMap { authRequest ->
                     userService.findById(authRequest.id)
@@ -31,16 +35,28 @@ class UserHandler(
                                 if (user.password != hash(authRequest.password)) {
                                     ServerResponse.badRequest().build()
                                 } else {
+                                    val token = jwtSigner.createJwt(user.id.toString())
+                                    val authCookie = ResponseCookie.fromClientResponse("X-Auth", token)
+                                            .maxAge(3600)
+                                            .httpOnly(true)
+                                            .path("/")
+                                            .secure(false) // в продакшене должно быть true.
+                                            .build()
+
+                                    logger.debug("Token: $token")
+                                    logger.debug("authCookie: $authCookie")
+
                                     ServerResponse
                                             .status(HttpStatus.OK)
                                             .contentType(MediaType.APPLICATION_JSON)
-                                            .bodyValue("Hi, you are just logged in as ${user.first_name} ${user.second_name}")
+                                            .header("Set-Cookie", authCookie.toString())
+                                            .bodyValue(AuthResponse(token = token))
                                 }
                             }
-                            .switchIfEmpty(
-                                    ServerResponse.notFound().build()
-                            )
                 }
+                .switchIfEmpty(
+                        ServerResponse.status(HttpStatus.UNAUTHORIZED).build()
+                )
     }
 
     fun register(request: ServerRequest): Mono<ServerResponse?> {
@@ -59,7 +75,7 @@ class UserHandler(
         return userService
                 .findById(request.pathVariable("userId"))
                 .flatMap { user ->
-                    logger.info("User found = $user")
+                    logger.debug("User found = $user")
                     ServerResponse
                             .ok()
                             .contentType(MediaType.APPLICATION_JSON)

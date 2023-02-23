@@ -7,3 +7,7 @@ databaseChangeLog:
       file: db/changelog/load-users.xml
   - include:
       file: db/changelog/init-index.xml
+  - include:
+      file: db/changelog/init-post.xml
+  - include:
+      file: db/changelog/init-friends.xml

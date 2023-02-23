@@ -1,6 +1,6 @@
 package me.kristinasaigak.otus.repository
 
-import me.kristinasaigak.otus.model.User
+import me.kristinasaigak.otus.model.entity.User
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.r2dbc.repository.R2dbcRepository
 import org.springframework.data.repository.query.Param

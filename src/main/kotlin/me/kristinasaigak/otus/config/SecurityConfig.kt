@@ -1,60 +1,37 @@
 package me.kristinasaigak.otus.config
 
-import me.kristinasaigak.otus.repository.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 
 
 @Configuration
 @EnableWebFluxSecurity
-class SecurityConfig(
-    private val userRepository: UserRepository
-) {
-
+class SecurityConfig {
     @Bean
-    fun securityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain? {
+    fun securityFilterChain(http: ServerHttpSecurity,
+                            jwtAuthenticationManager: ReactiveAuthenticationManager,
+                            jwtAuthenticationConverter: ServerAuthenticationConverter): SecurityWebFilterChain {
+        val authenticationWebFilter = AuthenticationWebFilter(jwtAuthenticationManager)
+        authenticationWebFilter.setServerAuthenticationConverter(jwtAuthenticationConverter)
         return http
-            .csrf().disable()
-            .authorizeExchange()
-            .pathMatchers("/login").permitAll()
-            .pathMatchers("/user/register").permitAll()
-            // todo later
-            // .anyExchange().authenticated()
-            .anyExchange().permitAll()
-            .and()
-            .httpBasic()
-            .and()
-            .formLogin().disable()
-            .build()
-    }
+                .csrf().disable()
+                .authorizeExchange()
+                .pathMatchers("/login").permitAll()
+                .pathMatchers("/user/register").permitAll()
+                .anyExchange().authenticated()
+                .and()
+                .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .httpBasic().disable()
+                .formLogin().disable()
 
-//    @Bean
-//    fun userDetailsService(): ReactiveUserDetailsService? {
-//        return ReactiveUserDetailsService{ id: String -> userRepository.findUserDetails(id) }
-//    }
+                .build()
 
-    @Bean
-    fun userDetailsService(): ReactiveUserDetailsService {
-        val user: UserDetails = User.withDefaultPasswordEncoder()
-            .username("user")
-            .password("password")
-            .roles("USER")
-            .build()
-        return MapReactiveUserDetailsService(user)
-    }
-
-
-    @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
     }
 }

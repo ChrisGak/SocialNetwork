@@ -1,4 +1,4 @@
-package me.kristinasaigak.otus.model
+package me.kristinasaigak.otus.model.api
 
 data class UserDto(
     var id: String?,

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="6" author="chrissaigak">
+        <createTable tableName="post">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="text" type="VARCHAR(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_user_id" type="BIGINT"/>
+            <column name="version" type="INT" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="post" baseColumnNames="author_user_id"
+                                 constraintName="fk_author_user_id" referencedTableName="user"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
