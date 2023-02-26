@@ -30,7 +30,6 @@ class SecurityConfig {
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .httpBasic().disable()
                 .formLogin().disable()
-
                 .build()
 
     }

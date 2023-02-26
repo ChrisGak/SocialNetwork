@@ -19,7 +19,7 @@ data class Post(
         @Column("text")
         var text: String,
         @Column("author_user_id")
-        var authorId: String? = null,
+        var authorUserId: String? = null,
         @Version
         var version: Long? = null,
         @CreatedDate

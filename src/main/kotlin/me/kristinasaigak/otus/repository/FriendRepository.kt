@@ -16,7 +16,8 @@ interface FriendRepository : R2dbcRepository<FriendRelationship, String> {
             "UNION ALL SELECT accepter_user_id as user_id from friends WHERE requester_user_id = :#{#userId}) as result")
     fun getFriendIds(@Param("userId") userId: String): Flux<Friend>
 
-    @Query("DELETE FROM friends WHERE (requester_user_id = :#{#userId} AND accepter_user_id = :#{#friendId}) " +
-            "OR (requester_user_id = :#{#friendId} AND accepter_user_id = :#{#userId})")
+    //    @Query("DELETE FROM friends WHERE (requester_user_id = :#{#userId} AND accepter_user_id = :#{#friendId}) " +
+    //            "OR (requester_user_id = :#{#friendId} AND accepter_user_id = :#{#userId})")
+    @Query("DELETE FROM friends WHERE requester_user_id = :#{#userId} AND accepter_user_id = :#{#friendId})")
     fun deleteByUserIdAndFriendId(@Param("userId") userId: String, @Param("friendId") friendId: String): Mono<Void>
 }

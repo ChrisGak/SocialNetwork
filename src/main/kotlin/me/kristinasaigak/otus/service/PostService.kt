@@ -1,48 +1,45 @@
 package me.kristinasaigak.otus.service
 
+import getCurrentUserId
 import me.kristinasaigak.otus.model.entity.Post
+import me.kristinasaigak.otus.repository.PostReactiveRepository
 import me.kristinasaigak.otus.repository.PostRepository
-import me.kristinasaigak.otus.repository.UserRepository
 import org.slf4j.LoggerFactory
-import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 
 @Component
 class PostService(
+        private val postReactiveRepository: PostReactiveRepository,
         private val postRepository: PostRepository,
-        private val userRepository: UserRepository,
-        private val userService: UserService
+        private val cacheService: CacheService
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun createPost(postText: String): Mono<Post> {
-        return ReactiveSecurityContextHolder.getContext()
-                .map {
-                    it.authentication.principal
-                }
+    fun createPost(postText: String): Mono<Void> {
+        return getCurrentUserId()
                 .flatMap { userId ->
                     logger.debug("Current user id: $userId")
-                    userRepository.findById(userId.toString()).flatMap { author ->
-                        postRepository.save(Post(text = postText, authorId = userId.toString()))
-                    }
+                    postReactiveRepository.save(Post(text = postText, authorUserId = userId.toString()))
+                            .then(cacheService.invalidateByAuthorId())
                 }
     }
 
     fun getPost(id: String): Mono<Post> =
-            postRepository.findById(id)
+            postReactiveRepository.findById(id)
 
-    fun searchPosts(offset: Int? = 0, limit: Int? = 10): Flux<Post> {
-        return userService.getFriends()
-                .map { friends ->
-                    logger.debug("Friends: $friends")
-
-                }.toFlux().flatMap { postRepository.findAll() }
+    fun searchPosts(offset: Long? = 0, limit: Long? = 10): Mono<List<Post>> {
+        return getCurrentUserId()
+                .flatMap { userId ->
+                    logger.debug("Current user id: $userId")
+                    postRepository.feed(userId)
+                            .stream().skip(offset!!).limit(limit!!).toList().toMono()
+                }
     }
 
     fun deletePost(postId: String): Mono<Void> =
-            postRepository.deleteById(postId)
+            postReactiveRepository.deleteById(postId)
+                    .then(cacheService.invalidateByAuthorId())
 }

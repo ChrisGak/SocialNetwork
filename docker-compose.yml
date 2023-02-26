@@ -33,6 +33,7 @@ services:
     environment:
       SPRING_LIQUIBASE_URL: "jdbc:mysql://mysqldb:3306/db?autoReconnect=true&useSSL=false"
       SPRING_R2DBC_URL: "r2dbc:pool:mysql://mysqldb:3306/db?tlsVersion=TLSv1.2"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/db?autoReconnect=true&useSSL=false"
     volumes:
       - .m2:/root/.m2
     stdin_open: true

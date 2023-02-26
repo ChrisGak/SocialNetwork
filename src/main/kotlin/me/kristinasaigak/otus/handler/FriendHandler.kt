@@ -12,12 +12,13 @@ class FriendHandler(private val userService: UserService) {
     fun addFriend(request: ServerRequest): Mono<ServerResponse> =
             request.pathVariable("userId")
                     .let { friendId ->
-                        userService.addFriend(friendId).flatMap { done ->
-                            if (done) {
-                                ServerResponse.ok().build()
-                            } else
-                                ServerResponse.badRequest().build()
-                        }
+                        userService.addFriend(friendId)
+                                .flatMap { done ->
+                                    if (done) {
+                                        ServerResponse.ok().build()
+                                    } else
+                                        ServerResponse.badRequest().build()
+                                }
                     }
 
     fun deleteFriend(request: ServerRequest): Mono<ServerResponse> =

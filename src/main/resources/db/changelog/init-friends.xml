@@ -24,6 +24,15 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
         <addForeignKeyConstraint baseTableName="friends" baseColumnNames="accepter_user_id"
                                  constraintName="fk_accepter_user_id" referencedTableName="user"
                                  referencedColumnNames="id"/>
-        <addUniqueConstraint tableName="friends" columnNames="requester_user_id,accepter_user_id"></addUniqueConstraint>
+        <!--        <addUniqueConstraint tableName="friends" columnNames="requester_user_id,accepter_user_id"></addUniqueConstraint>-->
+
+        <insert tableName="friends">
+            <column name="requester_user_id" value="1"/>
+            <column name="accepter_user_id" value="2"/>
+        </insert>
+        <insert tableName="friends">
+            <column name="requester_user_id" value="2"/>
+            <column name="accepter_user_id" value="1"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>

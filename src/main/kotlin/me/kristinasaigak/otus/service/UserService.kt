@@ -18,7 +18,8 @@ import reactor.kotlin.core.publisher.toMono
 @Service
 class UserService(
         private val userRepository: UserRepository,
-        private val friendRepository: FriendRepository
+        private val friendRepository: FriendRepository,
+        private val cacheService: CacheService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -55,6 +56,8 @@ class UserService(
                                     accepterUserId = friendId
                             )).flatMap {
                                 true.toMono()
+                            }.doOnEach {
+                                cacheService.invalidate(currentUserId)
                             }
                         }.switchIfEmpty {
                             logger.error("The friend user not found: $friendId")
@@ -71,16 +74,6 @@ class UserService(
                 }
     }
 
-    fun getFriends(): Mono<List<String>> =
-            getCurrentUserId()
-                    .flatMap { currentUserId ->
-                        logger.debug("Current user id: $currentUserId")
-                        friendRepository.getFriendIds(currentUserId)
-                                .map {
-                                    it.userId
-                                }.collectList()
-                    }
-
     fun deleteFriend(friendId: String): Mono<Void> =
             getCurrentUserId()
                     .flatMap { currentUserId ->
@@ -90,6 +83,9 @@ class UserService(
                                 }
                                 .doOnError {
                                     logger.error("The friend is not removed for current user: $currentUserId")
+                                }
+                                .doOnEach {
+                                    cacheService.invalidate(currentUserId)
                                 }
 
                     }
