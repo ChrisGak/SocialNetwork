@@ -6,15 +6,16 @@ spring:
     enabled: true
     user: user
     password: password
-    url: jdbc:mysql://mysqldb:3306/db?autoReconnect=true&useSSL=false
+    url: jdbc:mysql://master_db:3308/db?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   r2dbc:
-    url: r2dbc:pool:mysql://mysqldb:3306/db?tlsVersion=TLSv1.2
+    url: r2dbc:pool:mysql://master_db:3308/db?tlsVersion=TLSv1.2
     username: user
     password: password
   datasource:
-    url: jdbc:mysql://mysqldb:3306/db?autoReconnect=true&useSSL=false
+    url: jdbc:mysql://master_db:3308/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+    replicaUrl: jdbc:mysql://replica_db:3308/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
     username: user
     password: password
 
@@ -25,6 +26,7 @@ spring:
 
 logging:
   level:
+    org.springframework.jdbc.core: TRACE
     org.springframework.data.repository: TRACE
     org.springframework.r2dbc.r2dbc: TRACE
     liquibase.logLevel: TRACE

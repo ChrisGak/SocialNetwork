@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.SimpleDriverDataSource
-import com.mysql.jdbc.Driver
+import com.mysql.cj.jdbc.Driver
 import javax.sql.DataSource
 
 @Configuration
@@ -18,20 +18,39 @@ class DatabaseConfig(
 
     @Bean
     @Primary
-    fun source() : DataSource {
+    fun source(): DataSource {
+        logger.debug("Init connection to master db node")
         val ds = SimpleDriverDataSource()
         ds.apply {
             url = dbProperties.url
             username = dbProperties.username
             password = dbProperties.password
             ds.driver = Driver()
-        }.also { logger.info("DB connected with ${dbProperties.host()}")}
+        }.also { logger.info("DB connected to master db node with ${dbProperties.host()}") }
+        return ds
+    }
+
+    @Bean
+    fun sourceReplica(): DataSource {
+        logger.debug("Init connection to replica db node")
+        val ds = SimpleDriverDataSource()
+        ds.apply {
+            url = dbProperties.replicaUrl
+            username = dbProperties.username
+            password = dbProperties.password
+            ds.driver = Driver()
+        }.also { logger.info("DB connected to replica db node with ${dbProperties.replica()}") }
         return ds
     }
 
     @Bean
     @Primary
-    fun jdbcTemplate() : JdbcTemplate {
+    fun jdbcTemplate(): JdbcTemplate {
         return JdbcTemplate(source())
+    }
+
+    @Bean
+    fun replicaJdbcTemplate(): JdbcTemplate {
+        return JdbcTemplate(sourceReplica())
     }
 }

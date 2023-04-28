@@ -5,6 +5,7 @@ import me.kristinasaigak.otus.model.api.SearchUsersDto
 import me.kristinasaigak.otus.model.entity.FriendRelationship
 import me.kristinasaigak.otus.model.entity.User
 import me.kristinasaigak.otus.repository.FriendRepository
+import me.kristinasaigak.otus.repository.UserReplicaRepository
 import me.kristinasaigak.otus.repository.UserRepository
 import me.kristinasaigak.otus.utils.hash
 import org.slf4j.LoggerFactory
@@ -13,11 +14,13 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 
 @Service
 class UserService(
         private val userRepository: UserRepository,
+        private val userReplicaRepository: UserReplicaRepository,
         private val friendRepository: FriendRepository,
         private val cacheService: CacheService
 ) {
@@ -34,11 +37,11 @@ class UserService(
     }
 
     fun findById(userId: String?): Mono<User> {
-        return userRepository.findById(userId!!)
+        return userReplicaRepository.findById(userId!!).first().toMono()
     }
 
     fun searchUsers(searchUsersDto: SearchUsersDto): Flux<User> {
-        return userRepository.findByFirstNameAndSecondName(searchUsersDto.firstName, searchUsersDto.secondName)
+        return userReplicaRepository.findByFirstNameAndSecondName(searchUsersDto.firstName, searchUsersDto.secondName).stream().toFlux()
     }
 
     fun addFriend(friendId: String): Mono<Boolean> {

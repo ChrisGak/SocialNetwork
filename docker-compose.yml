@@ -1,10 +1,51 @@
 version: '3.8'
 
 services:
-  mysqldb:
+  master_db:
+    hostname: ${MYSQLDB_MASTER_HOST}
+    image: ${PERCONA_SERVER_IMAGE}:${PERCONA_SERVER_TAG}
+    volumes:
+      - ./config/master.cnf:/etc/my.cnf:ro
+      - ./data/master:/var/lib/mysqldb:rw
+      - ./input:/var/lib/mysql-files:rw
+    ports:
+      - '3308:${MYSQLDB_EXTERNAL_PORT}'
+    networks:
+      -  otus_percona_network
+    environment:
+      INIT_ROCKSDB: "yes"
+      MYSQL_DATABASE: $MYSQLDB_DATABASE
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'password'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'password'
+
+  replica_db:
+    hostname: ${MYSQLDB_REPLICA_HOST}
+    image: ${PERCONA_SERVER_IMAGE}:${PERCONA_SERVER_TAG}
+    depends_on:
+      - master_db
+    volumes:
+      - ./config/replica.cnf:/etc/my.cnf:ro
+      - ./data/replica:/var/lib/mysqldb:rw
+    # <Port exposed> : < MySQL Port running inside container>
+    ports:
+      - '3309:${MYSQLDB_EXTERNAL_PORT}'
+    networks:
+      -  otus_percona_network
+    environment:
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'password'
+      INIT_ROCKSDB: "yes"
+      MYSQL_DATABASE: $MYSQLDB_DATABASE
+
+  mysql:
     platform: linux/x86_64
     image: mysql:5.7
     restart: always
+    hostname: mysql
     environment:
       MYSQL_DATABASE: 'db'
       # So you don't have to use root, but you can if you like
@@ -16,24 +57,26 @@ services:
     ports:
       # <Port exposed> : < MySQL Port running inside container>
       - '3306:3306'
-    expose:
-      # Opens port 3306 on the container
-      - '3306'
-      # Where our data will be persisted
+    networks:
+      - otus_percona_network
     volumes:
       - db:/var/lib/mysqldb
 
   otus-app:
     image: otus-app:latest
     depends_on:
-      - mysqldb
-    restart: always
+      - master_db
+      - replica_db
+    restart: on-failure
     ports:
       - '8080:8080'
     environment:
-      SPRING_LIQUIBASE_URL: "jdbc:mysql://mysqldb:3306/db?autoReconnect=true&useSSL=false"
-      SPRING_R2DBC_URL: "r2dbc:pool:mysql://mysqldb:3306/db?tlsVersion=TLSv1.2"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/db?autoReconnect=true&useSSL=false"
+      SPRING_APPLICATION_JSON: '{
+               "spring.liquibase.url" : "jdbc:mysql://${MYSQLDB_MASTER_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
+               "spring.datasource.url" : "jdbc:mysql://${MYSQLDB_MASTER_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.datasource.replicaUrl" : "jdbc:mysql://${MYSQLDB_REPLICA_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",          
+               "spring.r2dbc.url" : "r2dbc:pool:mysql://${MYSQLDB_MASTER_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?tlsVersion=TLSv1.2"
+             }'
     volumes:
       - .m2:/root/.m2
     stdin_open: true
@@ -41,3 +84,8 @@ services:
 
 volumes:
   db:
+  percona-master:
+
+networks:
+  otus_percona_network:
+    driver: bridge
