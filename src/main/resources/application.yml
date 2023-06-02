@@ -1,28 +1,23 @@
 spring:
   application:
-    name: otus
+    name: otus-app
   liquibase:
     change-log: ./db/changelog/db.changelog-master.yaml
     enabled: true
-    user: user
-    password: password
-    url: jdbc:mysql://master_db:3308/db?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://master_db:5432/db?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+    driver-class-name: org.postgresql.Driver
 
   r2dbc:
-    url: r2dbc:pool:mysql://master_db:3308/db?tlsVersion=TLSv1.2
-    username: user
-    password: password
+    url: r2dbc:pool:postgresql://master_db/db?tlsVersion=TLSv1.2
+    username: postgres
+    password: postgres
   datasource:
-    url: jdbc:mysql://master_db:3308/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
-    replicaUrl: jdbc:mysql://replica_db:3308/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
-    username: user
-    password: password
-
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    url: jdbc:postgresql://master_db:5432/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+    replicaUrl: jdbc:postgresql://replica_db_1:15432/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+    username: postgres
+    password: postgres
 
 logging:
   level:
@@ -30,4 +25,5 @@ logging:
     org.springframework.data.repository: TRACE
     org.springframework.r2dbc.r2dbc: TRACE
     liquibase.logLevel: TRACE
+    me.kristinasaigak.otus: DEBUG
 

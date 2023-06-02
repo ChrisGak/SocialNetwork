@@ -1,91 +1,91 @@
-version: '3.8'
+version: '3.9'
 
 services:
   master_db:
-    hostname: ${MYSQLDB_MASTER_HOST}
-    image: ${PERCONA_SERVER_IMAGE}:${PERCONA_SERVER_TAG}
+    image: ${POSTGRES_IMAGE}
+    container_name: master_db
     volumes:
-      - ./config/master.cnf:/etc/my.cnf:ro
-      - ./data/master:/var/lib/mysqldb:rw
-      - ./input:/var/lib/mysql-files:rw
-    ports:
-      - '3308:${MYSQLDB_EXTERNAL_PORT}'
+#      For Windows:
+#      - C:\Docker\volumes\master_db:/var/lib/postgresql/data
+      - ./db_volume/master_db/:/var/lib/postgresql/data
+      - ./db_volume/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports: # <Port exposed> : <Port running inside container>
+      - '5432:5432'
     networks:
-      -  otus_percona_network
+      - otus_pgnetwork
     environment:
-      INIT_ROCKSDB: "yes"
-      MYSQL_DATABASE: $MYSQLDB_DATABASE
-      # So you don't have to use root, but you can if you like
-      MYSQL_USER: 'user'
-      # You can use whatever password you like
-      MYSQL_PASSWORD: 'password'
-      # Password for root access
-      MYSQL_ROOT_PASSWORD: 'password'
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $DATABASE
 
-  replica_db:
-    hostname: ${MYSQLDB_REPLICA_HOST}
-    image: ${PERCONA_SERVER_IMAGE}:${PERCONA_SERVER_TAG}
+  replica_db_1:
+    image: ${POSTGRES_IMAGE}
+    container_name: replica_db_1
     depends_on:
       - master_db
     volumes:
-      - ./config/replica.cnf:/etc/my.cnf:ro
-      - ./data/replica:/var/lib/mysqldb:rw
-    # <Port exposed> : < MySQL Port running inside container>
+      - ./db_volume/replica_db_1/:/var/lib/postgresql/data
     ports:
-      - '3309:${MYSQLDB_EXTERNAL_PORT}'
+      - '15432:5432'
     networks:
-      -  otus_percona_network
+      - otus_pgnetwork
     environment:
-      # Password for root access
-      MYSQL_ROOT_PASSWORD: 'password'
-      INIT_ROCKSDB: "yes"
-      MYSQL_DATABASE: $MYSQLDB_DATABASE
+      POSTGRES_PASSWORD: $REPLICATION_POSTGRES_PASSWORD
+      POSTGRES_DB: $DATABASE
 
-  mysql:
-    platform: linux/x86_64
-    image: mysql:5.7
-    restart: always
-    hostname: mysql
-    environment:
-      MYSQL_DATABASE: 'db'
-      # So you don't have to use root, but you can if you like
-      MYSQL_USER: 'user'
-      # You can use whatever password you like
-      MYSQL_PASSWORD: 'password'
-      # Password for root access
-      MYSQL_ROOT_PASSWORD: 'password'
-    ports:
-      # <Port exposed> : < MySQL Port running inside container>
-      - '3306:3306'
-    networks:
-      - otus_percona_network
+  replica_db_2:
+    image: ${POSTGRES_IMAGE}
+    container_name: replica_db_2
+    depends_on:
+      - master_db
     volumes:
-      - db:/var/lib/mysqldb
+      - ./db_volume/replica_db_2/:/var/lib/postgresql/data
+    ports:
+      - '25432:5432'
+    networks:
+      - otus_pgnetwork
+    environment:
+      POSTGRES_PASSWORD: $REPLICATION_POSTGRES_PASSWORD
+      POSTGRES_DB: $DATABASE
 
   otus-app:
     image: otus-app:latest
     depends_on:
       - master_db
-      - replica_db
-    restart: on-failure
+      - replica_db_1
+      - replica_db_2
+    restart: unless-stopped
     ports:
       - '8080:8080'
+    networks:
+      - otus_pgnetwork
     environment:
       SPRING_APPLICATION_JSON: '{
-               "spring.liquibase.url" : "jdbc:mysql://${MYSQLDB_MASTER_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
-               "spring.datasource.url" : "jdbc:mysql://${MYSQLDB_MASTER_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
-               "spring.datasource.replicaUrl" : "jdbc:mysql://${MYSQLDB_REPLICA_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",          
-               "spring.r2dbc.url" : "r2dbc:pool:mysql://${MYSQLDB_MASTER_HOST}:${MYSQLDB_EXTERNAL_PORT}/db?tlsVersion=TLSv1.2"
+               "spring.liquibase.url" : "jdbc:postgresql://master_db:5432/db?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
+               "spring.datasource.url" : "jdbc:postgresql://master_db:5432/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.r2dbc.url" : "r2dbc:pool:postgresql://master_db/db?tlsVersion=TLSv1.2",
+               "spring.datasource.replicaUrl" : "jdbc:postgresql://master_db:5432/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true"
              }'
     volumes:
       - .m2:/root/.m2
     stdin_open: true
     tty: true
 
-volumes:
-  db:
-  percona-master:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    ports:
+      - '3333:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - otus_pgnetwork
 
 networks:
-  otus_percona_network:
+  otus_pgnetwork:
+    name: otus_pgnetwork
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.19.0.0/16"

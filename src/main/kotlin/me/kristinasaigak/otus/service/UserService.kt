@@ -32,12 +32,19 @@ class UserService(
                 hash(user.password!!)
             } else null
         }.also {
+            logger.info("Create user: $user")
             return userRepository.save(user)
         }
     }
 
+    fun getCurrentUser(userId: Int): Mono<User> {
+        return userRepository.findById(userId)
+    }
+
     fun findById(userId: String?): Mono<User> {
-        return userReplicaRepository.findById(userId!!).first().toMono()
+        return userReplicaRepository.findById(userId!!)
+            .firstOrNull()
+            .toMono()
     }
 
     fun searchUsers(searchUsersDto: SearchUsersDto): Flux<User> {
@@ -52,11 +59,11 @@ class UserService(
                         logger.error("Current user can not add himself to friends: $friendId")
                         false.toMono()
                     } else {
-                        userRepository.findById(friendId).flatMap {
+                        userRepository.findById(friendId.toInt()).flatMap {
                             logger.debug("Friend user found: ${it.first_name} ${it.second_name}")
                             friendRepository.save(FriendRelationship(
-                                    requesterUserId = currentUserId.toString(),
-                                    accepterUserId = friendId
+                                    requesterUserId = currentUserId.toInt(),
+                                    accepterUserId = friendId.toInt()
                             )).flatMap {
                                 true.toMono()
                             }.doOnEach {
@@ -80,12 +87,12 @@ class UserService(
     fun deleteFriend(friendId: String): Mono<Void> =
             getCurrentUserId()
                     .flatMap { currentUserId ->
-                        friendRepository.deleteByUserIdAndFriendId(currentUserId, friendId)
+                        friendRepository.deleteByUserIdAndFriendId(currentUserId.toInt(), friendId.toInt())
                                 .doOnNext {
                                     logger.debug("The friend $friendId is removed for current user: $currentUserId")
                                 }
                                 .doOnError {
-                                    logger.error("The friend is not removed for current user: $currentUserId")
+                                    logger.error("The friend is not removed for current user: $currentUserId, ex: $it")
                                 }
                                 .doOnEach {
                                     cacheService.invalidate(currentUserId)

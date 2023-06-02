@@ -1,12 +1,12 @@
 package me.kristinasaigak.otus.config
 
+import org.postgresql.Driver
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.SimpleDriverDataSource
-import com.mysql.cj.jdbc.Driver
 import javax.sql.DataSource
 
 @Configuration

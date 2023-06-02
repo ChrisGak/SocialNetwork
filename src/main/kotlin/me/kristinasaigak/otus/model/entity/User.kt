@@ -4,11 +4,11 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
-@Table("user")
+@Table("users")
 data class User(
         @Id
         @Column("id")
-        var id: String?,
+        var id: Int? = null,
         @Column("first_name")
         var first_name: String,
         @Column("second_name")
@@ -18,7 +18,7 @@ data class User(
         @Column("biography")
         var biography: String? = null,
         @Column("city")
-        var city: String,
+        var city: String? = null,
         @Column("password")
         var password: String? = null
 )

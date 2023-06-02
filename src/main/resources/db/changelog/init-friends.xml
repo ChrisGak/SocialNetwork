@@ -18,11 +18,11 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
             <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
         </createTable>
         <addForeignKeyConstraint baseTableName="friends" baseColumnNames="requester_user_id"
-                                 constraintName="fk_requester_user_id" referencedTableName="user"
+                                 constraintName="fk_requester_user_id" referencedTableName="users"
                                  referencedColumnNames="id"/>
 
         <addForeignKeyConstraint baseTableName="friends" baseColumnNames="accepter_user_id"
-                                 constraintName="fk_accepter_user_id" referencedTableName="user"
+                                 constraintName="fk_accepter_user_id" referencedTableName="users"
                                  referencedColumnNames="id"/>
         <!--        <addUniqueConstraint tableName="friends" columnNames="requester_user_id,accepter_user_id"></addUniqueConstraint>-->
 

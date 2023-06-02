@@ -27,9 +27,9 @@ class CacheService(
             getCurrentUserId()
                     .flatMap { currentUserId ->
                         logger.info("Invalidate cache for friends of current user: $currentUserId")
-                        friendRepository.getFriendIds(currentUserId)
+                        friendRepository.getFriendIds(currentUserId.toInt())
                                 .map {
-                                    invalidate(it.userId)
+                                    invalidate(it.userId.toString())
                                 }.then()
                     }
 }

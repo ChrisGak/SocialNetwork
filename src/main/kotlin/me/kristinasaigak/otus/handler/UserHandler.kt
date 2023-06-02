@@ -30,7 +30,7 @@ class UserHandler(
     fun login(request: ServerRequest): Mono<ServerResponse> {
         return request.bodyToMono(AuthRequest::class.java)
                 .flatMap { authRequest ->
-                    userService.findById(authRequest.id)
+                    userService.getCurrentUser(authRequest.id)
                             .flatMap { user ->
                                 if (user.password != hash(authRequest.password)) {
                                     ServerResponse.badRequest().build()

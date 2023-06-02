@@ -9,7 +9,10 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="text" type="VARCHAR(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+<!--            <column name="text" type="VARCHAR(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+            <column name="text" type="VARCHAR(10000)">
                 <constraints nullable="false"/>
             </column>
             <column name="author_user_id" type="BIGINT"/>
@@ -24,7 +27,7 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
             </column>
         </createTable>
         <addForeignKeyConstraint baseTableName="post" baseColumnNames="author_user_id"
-                                 constraintName="fk_author_user_id" referencedTableName="user"
+                                 constraintName="fk_author_user_id" referencedTableName="users"
                                  referencedColumnNames="id"/>
 
         <insert tableName="post">

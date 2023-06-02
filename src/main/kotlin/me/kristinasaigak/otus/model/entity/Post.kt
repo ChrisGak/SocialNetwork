@@ -15,11 +15,11 @@ import java.time.LocalDateTime
 data class Post(
         @Id
         @Column("id")
-        var id: String? = null,
+        var id: Int? = null,
         @Column("text")
         var text: String,
         @Column("author_user_id")
-        var authorUserId: String? = null,
+        var authorUserId: Int? = null,
         @Version
         var version: Long? = null,
         @CreatedDate
