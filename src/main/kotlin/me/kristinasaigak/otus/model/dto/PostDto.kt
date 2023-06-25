@@ -1,4 +1,4 @@
-package me.kristinasaigak.otus.model.api
+package me.kristinasaigak.otus.model.dto
 
 data class PostDto(
         var text: String,

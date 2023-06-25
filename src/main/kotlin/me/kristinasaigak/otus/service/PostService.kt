@@ -1,9 +1,9 @@
 package me.kristinasaigak.otus.service
 
-import getCurrentUserId
 import me.kristinasaigak.otus.model.entity.Post
 import me.kristinasaigak.otus.repository.PostReactiveRepository
 import me.kristinasaigak.otus.repository.PostRepository
+import me.kristinasaigak.otus.utils.getCurrentUserId
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono

@@ -1,12 +1,16 @@
 package me.kristinasaigak.otus.config
 
+import me.kristinasaigak.otus.handler.DialogueHandler
 import me.kristinasaigak.otus.handler.FriendHandler
 import me.kristinasaigak.otus.handler.PostHandler
 import me.kristinasaigak.otus.handler.UserHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.server.RequestPredicates.*
+import org.springframework.web.reactive.function.server.RequestPredicates.GET
+import org.springframework.web.reactive.function.server.RequestPredicates.POST
+import org.springframework.web.reactive.function.server.RequestPredicates.PUT
+import org.springframework.web.reactive.function.server.RequestPredicates.accept
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.RouterFunctions.route
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -15,7 +19,8 @@ import org.springframework.web.reactive.function.server.ServerResponse
 class RouterConfig(
         private val userHandler: UserHandler,
         private val postHandler: PostHandler,
-        private val friendHandler: FriendHandler
+        private val friendHandler: FriendHandler,
+        private val dialogueHandler: DialogueHandler,
 ) {
 
     @Bean
@@ -30,6 +35,8 @@ class RouterConfig(
                 .andRoute(GET("/post/get").and(accept(MediaType.APPLICATION_JSON)), postHandler::getPost)
                 .andRoute(GET("/post/feed").and(accept(MediaType.APPLICATION_JSON)), postHandler::getPosts)
                 .andRoute(PUT("/post/delete").and(accept(MediaType.APPLICATION_JSON)), postHandler::removePost)
+                .andRoute(POST("/dialog/{userId}/send").and(accept(MediaType.APPLICATION_JSON)), dialogueHandler::sendMessage)
+                .andRoute(GET("/dialog/{userId}/list").and(accept(MediaType.APPLICATION_JSON)), dialogueHandler::getDialogue)
     }
 
     @Bean

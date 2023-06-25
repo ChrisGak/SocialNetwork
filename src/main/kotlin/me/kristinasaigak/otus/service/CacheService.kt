@@ -1,8 +1,8 @@
 package me.kristinasaigak.otus.service
 
-import getCurrentUserId
 import me.kristinasaigak.otus.config.CacheConfig
 import me.kristinasaigak.otus.repository.FriendRepository
+import me.kristinasaigak.otus.utils.getCurrentUserId
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Service

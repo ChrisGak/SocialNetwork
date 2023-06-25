@@ -1,13 +1,14 @@
 package me.kristinasaigak.otus.handler
 
 import lombok.RequiredArgsConstructor
-import me.kristinasaigak.otus.model.api.SearchUsersDto
-import me.kristinasaigak.otus.model.api.UserDto
+import me.kristinasaigak.otus.model.dto.SearchUsersDto
+import me.kristinasaigak.otus.model.dto.UserDto
 import me.kristinasaigak.otus.model.entity.User
 import me.kristinasaigak.otus.model.security.AuthRequest
 import me.kristinasaigak.otus.model.security.AuthResponse
 import me.kristinasaigak.otus.service.JwtSigner
 import me.kristinasaigak.otus.service.UserService
+import me.kristinasaigak.otus.utils.RequestParams
 import me.kristinasaigak.otus.utils.hash
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -44,7 +45,7 @@ class UserHandler(
                                             .build()
 
                                     logger.debug("Token: $token")
-                                    logger.debug("authCookie: $authCookie")
+                                    logger.debug("AuthCookie: $authCookie")
 
                                     ServerResponse
                                             .status(HttpStatus.OK)
@@ -73,7 +74,7 @@ class UserHandler(
 
     fun getUserById(request: ServerRequest): Mono<ServerResponse?> {
         return userService
-                .findById(request.pathVariable("userId"))
+                .findById(request.pathVariable(RequestParams.USER_ID.value))
                 .flatMap { user ->
                     logger.debug("User found = $user")
                     ServerResponse
@@ -92,8 +93,8 @@ class UserHandler(
     fun search(request: ServerRequest): Mono<ServerResponse> {
         logger.info("The users search request received with query params: ${request.queryParams()}")
         return userService.searchUsers(SearchUsersDto(
-                firstName = request.queryParam("first_name").orElse(""),
-                secondName = request.queryParam("second_name").orElse("")
+                firstName = request.queryParam(RequestParams.FIRST_NAME.value).orElse(""),
+                secondName = request.queryParam(RequestParams.SECOND_NAME.value).orElse("")
         )).collectList().flatMap { users ->
             ServerResponse
                     .ok()

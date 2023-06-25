@@ -12,3 +12,5 @@ databaseChangeLog:
       file: db/changelog/init-post.xml
   - include:
       file: db/changelog/init-friends.xml
+  - include:
+      file: db/changelog/init-dialogue.xml
