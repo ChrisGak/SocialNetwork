@@ -1,8 +1,0 @@
-[mysqld]
-server-id = 1
-binlog-format = ROW
-log-bin = /var/lib/mysql/mysql-bin.log
-log-bin-index = /var/lib/mysql/mysql-bin.log.index
-# Troubleshooting
-log-error = /var/lib/mysql/mysql.err
-bind-address = 0.0.0.0

@@ -5,4 +5,4 @@ import org.springframework.data.r2dbc.repository.R2dbcRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface PostReactiveRepository : R2dbcRepository<Post, String>
+interface PostReactiveRepository : R2dbcRepository<Post, Int>

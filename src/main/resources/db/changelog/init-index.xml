@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <changeSet id="5" author="chrissaigak">
-        <createIndex indexName="users_name_idx" tableName="user">
+        <createIndex indexName="users_name_idx" tableName="users">
             <column name="first_name"/>
             <column name="second_name"/>
         </createIndex>

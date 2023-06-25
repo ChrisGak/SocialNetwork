@@ -10,11 +10,11 @@ import java.time.LocalDateTime
 data class FriendRelationship(
         @Id
         @Column("id")
-        var id: String? = null,
+        var id: Int? = null,
         @Column("requester_user_id")
-        var requesterUserId: String,
+        var requesterUserId: Int,
         @Column("accepter_user_id")
-        var accepterUserId: String,
+        var accepterUserId: Int,
         @CreatedDate
         @Column("created_date")
         var createdDate: LocalDateTime? = null

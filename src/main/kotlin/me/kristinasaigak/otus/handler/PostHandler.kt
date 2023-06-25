@@ -19,7 +19,7 @@ class PostHandler(
     fun getPost(request: ServerRequest): Mono<ServerResponse> =
             request.queryParam("id").let {
                 if (it.isPresent) {
-                    postService.getPost(it.get()).flatMap {
+                    postService.getPost(it.get().toInt()).flatMap {
                         ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(PostDto(text = it.text, author = it.authorUserId))
@@ -62,7 +62,7 @@ class PostHandler(
     fun removePost(request: ServerRequest): Mono<ServerResponse> {
         val postId = request.queryParam("id")
         return if (postId.isPresent) {
-            postService.deletePost(postId.get()).flatMap {
+            postService.deletePost(postId.get().toInt()).flatMap {
                 ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue("Успешно удален пост")

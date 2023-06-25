@@ -17,9 +17,9 @@ class FriendService(
             getCurrentUserId()
                     .flatMap { currentUserId ->
                         logger.debug("Current user id: $currentUserId")
-                        friendRepository.getFriendIds(currentUserId)
+                        friendRepository.getFriendIds(currentUserId.toInt())
                                 .map {
-                                    it.userId
+                                    it.userId.toString()
                                 }.collectList()
                     }
 }

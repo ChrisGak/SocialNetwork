@@ -22,12 +22,12 @@ class PostService(
         return getCurrentUserId()
                 .flatMap { userId ->
                     logger.debug("Current user id: $userId")
-                    postReactiveRepository.save(Post(text = postText, authorUserId = userId.toString()))
+                    postReactiveRepository.save(Post(text = postText, authorUserId = userId.toInt()))
                             .then(cacheService.invalidateByAuthorId())
                 }
     }
 
-    fun getPost(id: String): Mono<Post> =
+    fun getPost(id: Int): Mono<Post> =
             postReactiveRepository.findById(id)
 
     fun searchPosts(offset: Long? = 0, limit: Long? = 10): Mono<List<Post>> {
@@ -39,7 +39,7 @@ class PostService(
                 }
     }
 
-    fun deletePost(postId: String): Mono<Void> =
+    fun deletePost(postId: Int): Mono<Void> =
             postReactiveRepository.deleteById(postId)
                     .then(cacheService.invalidateByAuthorId())
 }

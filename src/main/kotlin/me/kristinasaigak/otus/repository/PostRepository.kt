@@ -20,14 +20,14 @@ class PostRepository(
     fun feed(userId: String, feedSize: Int? = FEED_SIZE): List<Post> {
         return jdbcTemplate.query(
                 """
-                SELECT p.id, p.text, p.author_user_id, p.version, p.created_date, p.last_modified_date FROM post p 
-                JOIN friends f ON f.accepter_user_id = p.author_user_id
+                SELECT p.id, p.text, p.author_user_id, p.version, p.created_date, p.last_modified_date FROM "post" p 
+                JOIN "friends" f ON f.accepter_user_id = p.author_user_id
                 WHERE f.requester_user_id = ?
                 ORDER BY p.id ASC
                 LIMIT ?
             """.trimIndent(),
                 postMapper,
-                userId,
+                userId.toInt(),
                 feedSize
         )
     }

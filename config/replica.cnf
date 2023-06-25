@@ -1,6 +1,0 @@
-[mysqld]
-server-id = 2
-relay-log = /var/lib/mysql/mysql-relay-bin.log
-log_bin = /var/lib/mysql/mysql-bin.log
-log-error = /var/lib/mysql/mysql.err
-bind-address = 0.0.0.0

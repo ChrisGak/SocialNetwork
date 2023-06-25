@@ -1,10 +1,10 @@
 package me.kristinasaigak.otus.model.api
 
 data class UserDto(
-    var id: String?,
+    var id: Int?,
     var first_name: String,
     var second_name: String,
-    var age: Int,
+    var age: Int? = null,
     var biography: String? = null,
-    var city: String
+    var city: String? = null,
 )
