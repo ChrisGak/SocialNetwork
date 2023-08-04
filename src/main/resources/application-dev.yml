@@ -6,16 +6,16 @@ spring:
     enabled: true
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/db?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+    url: jdbc:postgresql://localhost:5432/postgres?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
     driver-class-name: org.postgresql.Driver
 
   r2dbc:
-    url: r2dbc:pool:postgresql://localhost:5432/db?tlsVersion=TLSv1.2
+    url: r2dbc:pool:postgresql://localhost:5432/postgres?tlsVersion=TLSv1.2
     username: postgres
     password: postgres
   datasource:
-    url: jdbc:postgresql://localhost:5432/db?useSSL=false&allowPublicKeyRetrieval=true
-    replicaUrl: jdbc:postgresql://localhost:15432/db?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:postgresql://localhost:5432/postgres?useSSL=false&allowPublicKeyRetrieval=true
+    replicaUrl: jdbc:postgresql://localhost:15432/postgres?useSSL=false&allowPublicKeyRetrieval=true
     username: postgres
     password: postgres
 

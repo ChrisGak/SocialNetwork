@@ -1,12 +1,12 @@
 package me.kristinasaigak.otus.service
 
-import getCurrentUserId
-import me.kristinasaigak.otus.model.api.SearchUsersDto
+import me.kristinasaigak.otus.model.dto.SearchUsersDto
 import me.kristinasaigak.otus.model.entity.FriendRelationship
 import me.kristinasaigak.otus.model.entity.User
 import me.kristinasaigak.otus.repository.FriendRepository
 import me.kristinasaigak.otus.repository.UserReplicaRepository
 import me.kristinasaigak.otus.repository.UserRepository
+import me.kristinasaigak.otus.utils.getCurrentUserId
 import me.kristinasaigak.otus.utils.hash
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
@@ -43,8 +43,8 @@ class UserService(
 
     fun findById(userId: String?): Mono<User> {
         return userReplicaRepository.findById(userId!!)
-            .firstOrNull()
-            .toMono()
+                .firstOrNull()
+                .toMono()
     }
 
     fun searchUsers(searchUsersDto: SearchUsersDto): Flux<User> {
