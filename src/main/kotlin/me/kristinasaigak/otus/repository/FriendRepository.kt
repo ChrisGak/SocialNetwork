@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono
 interface FriendRepository : R2dbcRepository<FriendRelationship, String> {
 
     @Query(
-        "SELECT user_id FROM (SELECT requester_user_id as user_id FROM \"friends\" WHERE accepter_user_id = :#{#userId} " +
+        "SELECT DISTINCT user_id FROM (SELECT requester_user_id as user_id FROM \"friends\" WHERE accepter_user_id = :#{#userId} " +
                 "UNION ALL SELECT accepter_user_id as user_id from friends WHERE requester_user_id = :#{#userId}) as result"
     )
     fun getFriendIds(@Param("userId") userId: Int): Flux<Friend>

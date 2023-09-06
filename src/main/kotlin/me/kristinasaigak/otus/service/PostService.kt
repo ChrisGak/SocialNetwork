@@ -13,7 +13,8 @@ import reactor.kotlin.core.publisher.toMono
 class PostService(
         private val postReactiveRepository: PostReactiveRepository,
         private val postRepository: PostRepository,
-        private val cacheService: CacheService
+        private val cacheService: CacheService,
+        private val rabbitQueueService: RabbitQueueService
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -23,6 +24,9 @@ class PostService(
                 .flatMap { userId ->
                     logger.debug("Current user id: $userId")
                     postReactiveRepository.save(Post(text = postText, authorUserId = userId.toInt()))
+                            .flatMap {
+                                rabbitQueueService.publishPost(userId, it)
+                            }
                             .then(cacheService.invalidateByAuthorId())
                 }
     }

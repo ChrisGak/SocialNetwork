@@ -7,6 +7,7 @@ import me.kristinasaigak.otus.model.entity.User
 import me.kristinasaigak.otus.model.security.AuthRequest
 import me.kristinasaigak.otus.model.security.AuthResponse
 import me.kristinasaigak.otus.service.JwtSigner
+import me.kristinasaigak.otus.service.RabbitQueueService
 import me.kristinasaigak.otus.service.UserService
 import me.kristinasaigak.otus.utils.RequestParams
 import me.kristinasaigak.otus.utils.hash
@@ -23,42 +24,43 @@ import reactor.core.publisher.Mono
 @RequiredArgsConstructor
 class UserHandler(
         private val userService: UserService,
-        private val jwtSigner: JwtSigner
+        private val jwtSigner: JwtSigner,
+        private val rabbitQueueService: RabbitQueueService
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun login(request: ServerRequest): Mono<ServerResponse> {
-        return request.bodyToMono(AuthRequest::class.java)
-                .flatMap { authRequest ->
-                    userService.getCurrentUser(authRequest.id)
-                            .flatMap { user ->
-                                if (user.password != hash(authRequest.password)) {
-                                    ServerResponse.badRequest().build()
-                                } else {
-                                    val token = jwtSigner.createJwt(user.id.toString())
-                                    val authCookie = ResponseCookie.fromClientResponse("X-Auth", token)
-                                            .maxAge(3600)
-                                            .httpOnly(true)
-                                            .path("/")
-                                            .secure(false) // в продакшене должно быть true.
-                                            .build()
+    fun login(request: ServerRequest): Mono<ServerResponse> = request.bodyToMono(AuthRequest::class.java)
+            .flatMap { authRequest ->
+                userService.getCurrentUser(authRequest.id)
+                        .flatMap { user ->
+                            if (user.password != hash(authRequest.password)) {
+                                ServerResponse.badRequest().build()
+                            } else {
+                                val token = jwtSigner.createJwt(user.id.toString())
+                                val authCookie = ResponseCookie.fromClientResponse("X-Auth", token)
+                                        .maxAge(3600)
+                                        .httpOnly(true)
+                                        .path("/")
+                                        .secure(false) // в продакшене должно быть true.
+                                        .build()
+                                logger.info("User logged in: $user")
+                                logger.debug("Token: $token")
+                                logger.debug("AuthCookie: $authCookie")
 
-                                    logger.debug("Token: $token")
-                                    logger.debug("AuthCookie: $authCookie")
-
-                                    ServerResponse
-                                            .status(HttpStatus.OK)
-                                            .contentType(MediaType.APPLICATION_JSON)
-                                            .header("Set-Cookie", authCookie.toString())
-                                            .bodyValue(AuthResponse(token = token))
-                                }
+                                rabbitQueueService.initPostFeed(user.id.toString()).then(
+                                        ServerResponse
+                                                .status(HttpStatus.OK)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .header("Set-Cookie", authCookie.toString())
+                                                .bodyValue(AuthResponse(token = token))
+                                )
                             }
-                }
-                .switchIfEmpty(
-                        ServerResponse.status(HttpStatus.UNAUTHORIZED).build()
-                )
-    }
+                        }
+            }
+            .switchIfEmpty(
+                    ServerResponse.status(HttpStatus.UNAUTHORIZED).build()
+            )
 
     fun register(request: ServerRequest): Mono<ServerResponse?> {
         val userRequest: Mono<User> = request.bodyToMono(User::class.java)

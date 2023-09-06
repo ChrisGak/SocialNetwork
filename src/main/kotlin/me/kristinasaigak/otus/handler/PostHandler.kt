@@ -23,7 +23,7 @@ class PostHandler(
                     postService.getPost(it.get().toInt()).flatMap {
                         ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(PostDto(text = it.text, author = it.authorUserId))
+                                .bodyValue(PostDto(postId = it.id.toString(), postText = it.text, author_user_id = it.authorUserId?.toString().orEmpty()))
                     }
                             .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_FOUND).build())
                 } else
@@ -54,7 +54,7 @@ class PostHandler(
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(
                             posts.map {
-                                PostDto(text = it.text, author = it.authorUserId)
+                                PostDto(postId = it.id.toString(), postText = it.text, author_user_id = it.authorUserId.toString())
                             }
                     )
         }

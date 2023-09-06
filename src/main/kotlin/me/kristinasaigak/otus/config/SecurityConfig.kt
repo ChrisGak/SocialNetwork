@@ -24,8 +24,11 @@ class SecurityConfig {
                 .authorizeExchange()
                 .pathMatchers("/login").permitAll()
                 .pathMatchers("/user/register").permitAll()
+                .pathMatchers("/actuator/**").permitAll()
+                // websocket path
+                .pathMatchers("/post/feed/posted").hasAuthority("ROLE_USER")
                 .anyExchange().authenticated()
-                // .anyExchange().permitAll()
+                //.anyExchange().permitAll()
                 .and()
                 .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .httpBasic().disable()
