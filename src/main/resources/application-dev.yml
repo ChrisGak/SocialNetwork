@@ -15,13 +15,22 @@ spring:
     password: postgres
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres?useSSL=false&allowPublicKeyRetrieval=true
-    replicaUrl: jdbc:postgresql://localhost:15432/postgres?useSSL=false&allowPublicKeyRetrieval=true
+    replicaUrl: jdbc:postgresql://localhost:5432/postgres?useSSL=false&allowPublicKeyRetrieval=true
     username: postgres
     password: postgres
 
 logging:
   level:
-    org.springframework.data.repository: DEBUG
-    org.springframework.r2dbc.r2dbc: DEBUG
+    org.springframework.data.repository: TRACE
+    org.springframework.r2dbc.r2dbc: TRACE
+    org.springframework.web.reactive: TRACE
     liquibase.logLevel: TRACE
     me.kristinasaigak.otus: DEBUG
+
+management:
+  server:
+    port: 8082
+  endpoints:
+    web:
+      exposure:
+        include: health

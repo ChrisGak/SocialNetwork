@@ -492,3 +492,20 @@ SELECT create_distributed_table('composite_type_partitioned_dialogue_table', 'co
 Но на этом шаге (create_distributed_table) я встречаю ошибку
 ERROR:  could not find function for data typeId 17254
 Быстро решение не нашла, так что до конца довести решениие с композитным ключом не удалось
+
+## Домашнее задание #6 Онлайн обновление ленты новостей
+### Реализован функционал
+* Создание поста (метод /post/create из спецификации)
+![img_2.png](queues/screenshots/create_post.png)
+* Отправка сообщений в канал /post/feed/posted через websocket согласно спецификации
+![img_2.png](queues/screenshots/websocket.png)
+
+
+Настроен exchange 'tweet.published', в который поступают посты при публикации. С помощью routing-key = userId пользователя-публикатора поста, настраиваются bindings между exchange и топиками с названием "post-feed.user-<userId>".  
+При входе в систему (вызове API /login) происходит создание топиков и связывание с exchange. При подключении через websocket к ленте новостей, происходит подписка на топики друзей текущего пользователя.
+![exchange.png](queues/screenshots/exchange.png)
+![queue 1.png](queues/screenshots/queue 1.png)
+
+#### Комментарии к текущему решению
+* Очередь сообщений формируется на запись для каждого пользователя-публикатора
+* При получении сообщения из ленты друзей одним из подписчиков и acknowledge, сообщение помечается прочитанным, и для др пользователей в ленте уже не будет отражено

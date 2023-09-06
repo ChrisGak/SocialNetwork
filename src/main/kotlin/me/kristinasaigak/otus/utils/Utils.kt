@@ -4,6 +4,11 @@ import me.kristinasaigak.otus.exception.IdNotParsedException
 import java.lang.Exception
 import java.security.MessageDigest
 
+const val TWEET_PUBLISHED_EXCHANGE: String = "tweet.published"
+const val POST_QUEUE_NAME: String = "post-feed.user-"
+
+fun userFeedQueueName(userId: String): String = "$POST_QUEUE_NAME${userId}"
+
 enum class RequestParams(
         val value: String
 ) {

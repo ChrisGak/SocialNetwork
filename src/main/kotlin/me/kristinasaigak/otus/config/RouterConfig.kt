@@ -27,7 +27,6 @@ class RouterConfig(
     fun routes(): RouterFunction<ServerResponse> {
         return route(GET("/user/search").and(accept(MediaType.APPLICATION_JSON)), userHandler::search)
                 .andRoute(GET("/user/get/{userId}").and(accept(MediaType.APPLICATION_JSON)), userHandler::getUserById)
-                .andRoute(POST("/login").and(accept(MediaType.APPLICATION_JSON)), userHandler::login)
                 .andRoute(PUT("/friend/add/{userId}").and(accept(MediaType.APPLICATION_JSON)), friendHandler::addFriend)
                 .andRoute(PUT("/friend/delete/{userId}").and(accept(MediaType.APPLICATION_JSON)), friendHandler::deleteFriend)
                 .andRoute(POST("/user/register").and(accept(MediaType.APPLICATION_JSON)), userHandler::register)

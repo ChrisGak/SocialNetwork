@@ -22,7 +22,8 @@ class UserService(
         private val userRepository: UserRepository,
         private val userReplicaRepository: UserReplicaRepository,
         private val friendRepository: FriendRepository,
-        private val cacheService: CacheService
+        private val cacheService: CacheService,
+        private val rabbitQueueService: RabbitQueueService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -95,6 +96,7 @@ class UserService(
                                     logger.error("The friend is not removed for current user: $currentUserId, ex: $it")
                                 }
                                 .doOnEach {
+                                    rabbitQueueService.unsubscribeTopic(currentUserId, friendId)
                                     cacheService.invalidate(currentUserId)
                                 }
 

@@ -34,6 +34,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.springframework.boot:spring-boot-starter-integration")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.projectreactor.rabbitmq:reactor-rabbitmq:1.5.6")
+    // Not supported with spring-boot-starter-webflux implementation("org.springframework.boot:spring-boot-starter-websocket")
     // DB
     implementation("org.postgresql:postgresql:42.5.4")
     implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")

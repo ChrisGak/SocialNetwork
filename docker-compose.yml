@@ -14,6 +14,7 @@ services:
       PGUSER: "${POSTGRES_USER:-postgres}"
       PGPASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_HOST_AUTH_METHOD: "${POSTGRES_HOST_AUTH_METHOD:-trust}"
+
   worker:
     image: "citusdata/citus:11.3.0"
     labels: [ "com.citusdata.role=Worker" ]
@@ -22,6 +23,7 @@ services:
     command: "/wait-for-manager.sh"
     volumes:
       - healthcheck-volume:/healthcheck
+
   manager:
     container_name: "${COMPOSE_PROJECT_NAME:-citus}_manager"
     image: "citusdata/membership-manager:0.3.0"
@@ -30,19 +32,29 @@ services:
       - healthcheck-volume:/healthcheck
     depends_on: [ master ]
     environment: *AUTH
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      # Admin http://localhost:15672/ guest / guest
+
   otus-app:
     image: otus-app:latest
     depends_on:
       - master
-    restart: unless-stopped
+      - rabbitmq
     ports:
       - '8080:8080'
     environment:
       SPRING_APPLICATION_JSON: '{
-               "spring.liquibase.url" : "jdbc:postgresql://master:5432/postgres?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
-               "spring.datasource.url" : "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
-               "spring.r2dbc.url" : "r2dbc:pool:postgresql://master/postgres?tlsVersion=TLSv1.2",
-               "spring.datasource.replicaUrl" : "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true"
+               "spring.liquibase.url": "jdbc:postgresql://master:5432/postgres?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
+               "spring.datasource.url": "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.r2dbc.url": "r2dbc:pool:postgresql://master/postgres?tlsVersion=TLSv1.2",
+               "spring.datasource.replicaUrl": "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.rabbitmq.host": "rabbitmq",
+               "spring.rabbitmq.port": 5672
              }'
     volumes:
       - .m2:/root/.m2
