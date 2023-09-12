@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+  scrape_timeout: 5s
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'otus_app'
+
+scrape_configs:
+  - job_name: 'prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['otus-app:8080', 'otus-dialogues-app:8081']

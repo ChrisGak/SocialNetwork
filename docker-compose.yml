@@ -35,14 +35,15 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: "rabbitmq"
     ports:
       - "5672:5672"
       - "15672:15672"
       # Admin http://localhost:15672/ guest / guest
 
   tarantool:
-    container_name: "tarantool"
     image: tarantool/tarantool:latest
+    container_name: "tarantool"
     ports:
       - "3301:3301"
     volumes:
@@ -51,6 +52,7 @@ services:
 
   otus-app:
     image: otus-app:latest
+    container_name: "otus-app"
     depends_on:
       - master
       - rabbitmq
@@ -73,6 +75,7 @@ services:
 
   otus-dialogues-app:
     image: otus-dialogues-app:latest
+    container_name: "otus-dialogues-app"
     depends_on:
       - tarantool
     ports:
@@ -86,5 +89,80 @@ services:
                "tarantool.port": 3301
              }'
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: "prometheus"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: "grafana"
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+
+  postgres-server: # The Postgres Database Service
+    image: postgres:latest
+    container_name: "postgres-server"
+    restart: always
+    environment: # Username, password and database name variables
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix
+      POSTGRES_DB: zabbix
+      PG_DATA: /var/lib/postgresql/data/pgdata #data storage
+
+  zabbix-server: # The main Zabbix Server Software Service
+    image: zabbix/zabbix-server-pgsql:alpine-3.2-latest
+    container_name: "zabbix-server"
+    restart: on-failure
+    environment: # The Postgres database value variable
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix
+      POSTGRES_DB: zabbix
+      ZBX_HISTORYSTORAGETYPES: log,text #Zabbix configuration variables
+      ZBX_DEBUGLEVEL: 1
+      ZBX_HOUSEKEEPINGFREQUENCY: 1
+      ZBX_MAXHOUSEKEEPERDELETE: 5000
+    ports:
+#      - "10060:10050"
+      - "10051:10051"
+    depends_on:
+      - postgres-server
+#    volumes: # Volumes for scripts and related files you can add
+#      - ./zabbix/alertscripts:/usr/lib/zabbix/alertscripts
+
+  zabbix-web: # The main Zabbix web UI or interface
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-3.2-latest
+    restart: always
+    environment: # Postgre database variables
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix
+      POSTGRES_DB: zabbix
+      ZBX_SERVER_HOST: zabbix-server  # Zabbix related and Php variables
+      ZBX_POSTMAXSIZE: 64M
+      PHP_TZ: "Asia/Kolkata"
+      ZBX_MAXEXECUTIONTIME: 500
+    depends_on:
+      - postgres-server
+      - zabbix-server
+    ports: # Port where Zabbix UI is available
+      - "8090:80"
+
+  zabbix-agent: # Zabbix agent service that tracks usage and send to zabbix server
+    image: zabbix/zabbix-agent:alpine-3.2-latest
+    privileged: true   #access mode for allowing resource access
+    network_mode: "host"
+    restart: unless-stopped
+    environment:
+      - ZBX_SERVER_HOST=127.0.0.1 #the IP/Dns of Zabbix server
+
 volumes:
   healthcheck-volume:
+  grafana-data:

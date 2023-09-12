@@ -565,3 +565,67 @@ ERROR:  could not find function for data typeId 17254
     -- Подключить lua скрипт
     dofile('/opt/tarantool/init.lua')    
 ```   
+
+## Домашнее задание #12 Мониторинг
+RED method для сервисов:
+* Rate - количество запросов в секунду
+* Errors - количество ошибок
+* Duration - время запроса
+### Метрики
+## Otus-app
+* otus.request.handled - Метрика обработки REST-запросов с тэгом "url"
+* otus.websocket.request.handled - Метрика обработки Websocket-запросов с тэгом "url"
+## Otus-dialogues-app
+* otus.dialogue.send-message.handled - Метрика обработки REST-запросов на отправку сообщения
+* otus.dialogue.get-messages.handled - Метрика обработки REST-запроса на получение диалога
+### Prometheus
+В модуле использован Prometheus в качестве сборщика метрик. 
+spring-boot-starter-actuator использован для метаданных приложения.
+[Exposing Reactor metrics](https://projectreactor.io/docs/core/release/reference/#metrics) позволяет формировать метрики типа [Flow Duration](https://projectreactor.io/docs/core/release/reference/#observability-metrics-flow-duration),
+содержащие информацию о времени и количестве запросов, а также о деталях возникших ошибок, что соответствует методу RED.
+
+Вывод метрик доступен:
+* Otus-app - http://localhost:8080/actuator/prometheus
+  * ![otus-app actuator prometheus.jpg](monitoring%2Fscreenshots%2Fotus-app%20actuator%20prometheus.jpg)
+  * ![otus-app actuator prometheus 2.jpg](monitoring%2Fscreenshots%2Fotus-app%20actuator%20prometheus%202.jpg)
+* Otus-dialogues-app - http://localhost:8081/actuator/prometheus
+  * ![Dialogues app actuator prometheus.jpg](monitoring%2Fscreenshots%2FDialogues%20app%20actuator%20prometheus.jpg)
+  * ![Dialogues app actuator prometheus 2.jpg](monitoring%2Fscreenshots%2FDialogues%20app%20actuator%20prometheus%202.jpg)
+
+#### Prometheus UI
+
+![Prometheus UI.jpg](monitoring%2Fscreenshots%2FPrometheus%20UI.jpg)
+
+### Grafana
+http://localhost:3000 in your browser. Use **admin/admin** credentials for the first login.
+
+#### Пример Dashboard в Grafana
+
+![Grafana Dashboard With 4 Visualizations.jpg](monitoring%2Fscreenshots%2FGrafana%20Dashboard%20With%204%20Visualizations.jpg)
+![Grafana Visualization.jpg](monitoring%2Fscreenshots%2FGrafana%20Visualization.jpg)
+
+https://grafana.com/grafana/dashboards/11378-justai-system-monitor/
+![Imported Spring Boot Dashboard.jpg](monitoring%2Fscreenshots%2FImported%20Spring%20Boot%20Dashboard.jpg)
+
+### Zabbix
+![zabbix.jpg](monitoring%2Fscreenshots%2Fzabbix.jpg)
+
+Zabbix – одна из наиболее распространённых систем мониторинга ИТ-инфраструктуры. Её применяют для выявления и предотвращения потенциальных проблем с оборудованием или в работе сайта, домена приложений.
+Система разделена на 5 компонентов, что позволяет одновременно отслеживать работу большого количества устройств, исключив перегрузки.
+* zabbix-server - The main Zabbix Server Software Service
+  Основной сервер – собирает и обрабатывает информацию. Через него происходит дистанционное управлением сетевыми сервисами. В случае обнаружения проблем с оборудованием основной сервер направляет оповещения администратору.
+* В базах данных хранится собранная информация. Срок хранения назначает пользователь в соответствии со своими целями. Система совместима с несколькими наиболее востребованными базами, такими как MySQL, PostgreSQL, SQL Server, Oracle и другими.
+* zabbix-agent - Zabbix agent service that tracks usage and send to zabbix server
+Можно сказать про zabbix agent, что это программа, осуществляющая мониторинг и формирующая статистику работы локальных ресурсов. Она умеет самостоятельно получать данные автоматически или только по запросу от сервера. Этот элемент очень важен, однако его можно заменить другими инструментами, поэтому его использование носит лишь рекомендательный характер.
+http://localhost:8090/ Login web interface using credentials **Admin/zabbix** for the first login.
+* Прокси управляет агентами и выполняет предобработку данных, тем самым минимизируя нагрузку на Zabbix-сервер. Этот компонент тоже не обязательный и актуален только для организаций, которым необходимо контролировать одновременно большой комплекс устройств.
+* zabbix-web - The main Zabbix web UI or interface 
+Веб-интерфейс нужен для понятного отображения информации.
+
+![Zabbix main.jpg](monitoring%2Fscreenshots%2FZabbix%20main.jpg)
+![Zabbix Hosts.jpg](monitoring%2Fscreenshots%2FZabbix%20Hosts.jpg)
+![Zabbix Trigger example.jpg](monitoring%2Fscreenshots%2FZabbix%20Trigger%20example.jpg)
+#### Полезные ссылки
+* [Documentation](https://www.zabbix.com/documentation/current/en/manual/installation/containers)
+* [Zabbix: что это за программа и как ей пользоваться](https://www.nic.ru/help/zabbix-chto-eto-za-programma-i-kak-ej-pol6zovat6sya_11092.html)
+* [How To Run Zabbix Server in Docker Containers](https://techviewleo.com/how-to-run-zabbix-server-in-docker-containers/)

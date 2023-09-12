@@ -4,6 +4,7 @@ import me.kristinasaigak.otus.model.dto.DialogueMessageRequest
 import me.kristinasaigak.otus.service.DialogueV2ServiceImpl
 import me.kristinasaigak.otus.utils.RequestParams
 import me.kristinasaigak.otus.utils.generateProcessId
+import me.kristinasaigak.otus.utils.metricHandledRequest
 import me.kristinasaigak.otus.utils.toIntOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -32,6 +33,7 @@ class DialogueHandler(
                                         ServerResponse.status(HttpStatus.CREATED).build()
                                 )
                     }
+                    .metricHandledRequest("/dialog/{userId}/send")
 
     fun sendMessageV2(request: ServerRequest): Mono<ServerResponse> =
             request.bodyToMono(DialogueMessageRequest::class.java)
@@ -44,6 +46,7 @@ class DialogueHandler(
                                         ServerResponse.status(HttpStatus.CREATED).build()
                                 )
                     }
+                    .metricHandledRequest("/v2/dialogue/{userId}/send")
 
     @Deprecated("Use me.kristinasaigak.otus.handler.DialogueHandler#getDialogueV2 instead")
     fun getDialogue(request: ServerRequest): Mono<ServerResponse> =
@@ -61,6 +64,7 @@ class DialogueHandler(
                         }
                         .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_FOUND).build())
             }
+                    .metricHandledRequest("/dialog/{userId}/list")
 
     fun getDialogueV2(request: ServerRequest): Mono<ServerResponse> =
             request.pathVariable(RequestParams.USER_ID.value).let {
@@ -74,4 +78,5 @@ class DialogueHandler(
                         }
                         .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_FOUND).build())
             }
+                    .metricHandledRequest("/v2/dialogue/{userId}/list")
 }

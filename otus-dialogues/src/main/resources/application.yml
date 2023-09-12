@@ -40,3 +40,29 @@ logging:
     liquibase.logLevel: TRACE
     me.kristinasaigak.otus: DEBUG
 
+management:
+  endpoints:
+    enabled-by-default: true
+    web.exposure.include: '*'
+  endpoint:
+    prometheus.enabled: true
+    env.enabled: true
+    configprops.enabled: true
+    info.enabled: true
+    loggers.enabled: true
+    metrics.enabled: true
+    threaddump.enabled: true
+    health:
+      enabled: true
+      show-details: always
+  metrics:
+    distribution:
+      percentiles:
+        "[http.server.requests]": 0.75, 0.95, 0.99
+        "[otus.dialogue.send-message.handled]": 0.75, 0.95, 0.99
+        "[otus.dialogue.get-messages.handled]": 0.75, 0.95, 0.99
+      percentiles-histogram:
+        "[http.server.requests]": true
+        "[otus.dialogue.send-message.handled]": true
+        "[otus.dialogue.get-messages.handled]": true
+

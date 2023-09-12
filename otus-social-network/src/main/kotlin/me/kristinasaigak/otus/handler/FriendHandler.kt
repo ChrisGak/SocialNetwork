@@ -2,6 +2,7 @@ package me.kristinasaigak.otus.handler
 
 import me.kristinasaigak.otus.service.UserService
 import me.kristinasaigak.otus.utils.RequestParams
+import me.kristinasaigak.otus.utils.metricHandledRequest
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -21,6 +22,7 @@ class FriendHandler(private val userService: UserService) {
                                         ServerResponse.badRequest().build()
                                 }
                     }
+                    .metricHandledRequest("/friend/add/{userId}")
 
     fun deleteFriend(request: ServerRequest): Mono<ServerResponse> =
             request.pathVariable(RequestParams.USER_ID.value).let { friendId ->
@@ -30,4 +32,5 @@ class FriendHandler(private val userService: UserService) {
                     ServerResponse.badRequest().build()
                 }
             }
+                    .metricHandledRequest("/friend/delete/{userId}")
 }

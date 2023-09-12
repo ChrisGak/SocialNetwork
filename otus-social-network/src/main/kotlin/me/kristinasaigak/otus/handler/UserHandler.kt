@@ -11,6 +11,7 @@ import me.kristinasaigak.otus.service.RabbitQueueService
 import me.kristinasaigak.otus.service.UserService
 import me.kristinasaigak.otus.utils.RequestParams
 import me.kristinasaigak.otus.utils.hash
+import me.kristinasaigak.otus.utils.metricHandledRequest
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -61,8 +62,9 @@ class UserHandler(
             .switchIfEmpty(
                     ServerResponse.status(HttpStatus.UNAUTHORIZED).build()
             )
+            .metricHandledRequest("/login")
 
-    fun register(request: ServerRequest): Mono<ServerResponse?> {
+    fun register(request: ServerRequest): Mono<ServerResponse> {
         val userRequest: Mono<User> = request.bodyToMono(User::class.java)
         return userRequest
                 .flatMap { userService.createUser(it) }
@@ -72,25 +74,25 @@ class UserHandler(
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(user.id!!)
                 }
+                .metricHandledRequest("/user/register")
     }
 
-    fun getUserById(request: ServerRequest): Mono<ServerResponse?> {
-        return userService
-                .findById(request.pathVariable(RequestParams.USER_ID.value))
-                .flatMap { user ->
-                    logger.debug("User found = $user")
-                    ServerResponse
-                            .ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(
-                                    UserDto(
-                                            user.id, user.first_name, user.second_name,
-                                            user.age, user.biography, user.city
-                                    )
-                            )
-                }
-                .switchIfEmpty(ServerResponse.notFound().build())
-    }
+    fun getUserById(request: ServerRequest): Mono<ServerResponse> = userService
+            .findById(request.pathVariable(RequestParams.USER_ID.value))
+            .flatMap { user ->
+                logger.debug("User found = $user")
+                ServerResponse
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(
+                                UserDto(
+                                        user.id, user.first_name, user.second_name,
+                                        user.age, user.biography, user.city
+                                )
+                        )
+            }
+            .switchIfEmpty(ServerResponse.notFound().build())
+            .metricHandledRequest("/user/get/{userId}")
 
     fun search(request: ServerRequest): Mono<ServerResponse> {
         logger.info("The users search request received with query params: ${request.queryParams()}")
@@ -110,5 +112,6 @@ class UserHandler(
                             }
                     )
         }
+                .metricHandledRequest("/user/search")
     }
 }

@@ -4,7 +4,9 @@ import me.kristinasaigak.otus.model.dto.DialogueMessageRequest
 import me.kristinasaigak.otus.model.dto.GetDialogueRequest
 import me.kristinasaigak.otus.model.dto.GetDialogueResponse
 import me.kristinasaigak.otus.service.TarantoolDialogueServiceImpl
+import me.kristinasaigak.otus.utils.MetricTitle
 import me.kristinasaigak.otus.utils.PROCESS_ID_HEADER_NAME
+import me.kristinasaigak.otus.utils.metric
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -27,6 +29,7 @@ class DialogueHandler(
                         dialogueServiceImpl.createDialogue(message)
                         ServerResponse.status(HttpStatus.CREATED).build()
                     }
+                    .metric(MetricTitle.SEND_MESSAGE_HANDLED.value)
 
     fun getDialogue(request: ServerRequest): Mono<ServerResponse> =
             request.bodyToMono(GetDialogueRequest::class.java)
@@ -48,4 +51,5 @@ class DialogueHandler(
                     .also {
                         logger.debug("Received request $request")
                     }
+                    .metric(MetricTitle.GET_DIALOGUE_HANDLE.value)
 }
