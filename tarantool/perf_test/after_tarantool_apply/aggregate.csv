@@ -1,0 +1,5 @@
+Label,# Samples,Average,Median,90% Line,95% Line,99% Line,Min,Max,Error %,Throughput,Received KB/sec,Sent KB/sec
+Login,1151,11247,10652,19110,25151,31011,4307,31510,0.000%,36.29426,28.74,8.83
+Send dialogue message,1151,21637,21656,41321,45405,50927,5,53814,0.000%,17.58353,4.17,13.67
+Get dialogue messages for current user and specified user,1151,24171,25581,39659,43672,46786,33,51531,0.000%,15.42007,1353.73,11.97
+TOTAL,3453,19018,16098,38282,43376,46868,5,53814,0.000%,43.70499,1293.95,26.18
