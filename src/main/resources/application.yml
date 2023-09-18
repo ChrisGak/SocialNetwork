@@ -23,6 +23,12 @@ spring:
     host: localhost
     port: 5672
 
+tarantool:
+  host: tarantool
+  port: 3301
+  username: admin
+  password: admin
+
 logging:
   level:
     org.springframework.jdbc.core: TRACE

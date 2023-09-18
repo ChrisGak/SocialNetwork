@@ -1,0 +1,5 @@
+Label,# Samples,Average,Min,Max,Std. Dev.,Error %,Throughput,Received KB/sec,Sent KB/sec,Avg. Bytes
+Login,2057,5786,1318,8048,1148.40,0.000%,21.23377,16.82,5.16,811.0
+Send dialogue message,2057,3951,3096,5804,626.24,0.000%,20.32729,4.82,15.80,243.0
+Get dialogue messages for current user and specified user,2057,7823,3364,12485,2205.05,0.000%,18.72639,892.60,14.54,48809.2
+TOTAL,6171,5853,1318,12485,2166.13,0.000%,53.64687,870.77,32.13,16621.1

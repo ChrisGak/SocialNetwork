@@ -5,11 +5,11 @@ import me.kristinasaigak.otus.repository.PostReactiveRepository
 import me.kristinasaigak.otus.repository.PostRepository
 import me.kristinasaigak.otus.utils.getCurrentUserId
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
-@Component
+@Service
 class PostService(
         private val postReactiveRepository: PostReactiveRepository,
         private val postRepository: PostRepository,

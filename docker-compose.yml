@@ -40,11 +40,21 @@ services:
       - "15672:15672"
       # Admin http://localhost:15672/ guest / guest
 
+  tarantool:
+    container_name: "tarantool"
+    image: tarantool/tarantool:latest
+    ports:
+      - "3301:3301"
+    volumes:
+      - ./tarantool/conf/init.lua:/opt/tarantool/init.lua
+      - ./tarantool/data:/var/lib/tarantool
+
   otus-app:
     image: otus-app:latest
     depends_on:
       - master
       - rabbitmq
+      - tarantool
     ports:
       - '8080:8080'
     environment:
@@ -54,7 +64,9 @@ services:
                "spring.r2dbc.url": "r2dbc:pool:postgresql://master/postgres?tlsVersion=TLSv1.2",
                "spring.datasource.replicaUrl": "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
                "spring.rabbitmq.host": "rabbitmq",
-               "spring.rabbitmq.port": 5672
+               "spring.rabbitmq.port": 5672,
+               "tarantool.host": "tarantool",
+               "tarantool.port": 3301       
              }'
     volumes:
       - .m2:/root/.m2

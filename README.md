@@ -509,3 +509,35 @@ ERROR:  could not find function for data typeId 17254
 #### Комментарии к текущему решению
 * Очередь сообщений формируется на запись для каждого пользователя-публикатора
 * При получении сообщения из ленты друзей одним из подписчиков и acknowledge, сообщение помечается прочитанным, и для др пользователей в ленте уже не будет отражено
+
+## Домашнее задание #7 Применение tarantool'а как хранилища
+### Реализован функционал
+* Вынесено хранение данных из SQL БД в Tarantool
+* Для общения с tarantool'ом использованы процедуры (функции lua), не использовать прямые запросы в space'ы при помощи драйвера
+Использован Spring Data Tarantool с возможностью вызывать Lua скрипты (Proxy Tarantool functions in repositories)[https://github.com/tarantool/cartridge-springdata/#proxy-tarantool-functions-in-repositories] 
+Скрипты вынесены в init.lua
+После старта приложения через таску composeUp нужно выполнить dofile('/opt/tarantool/init.lua') для подключения этого скрипта
+``` 
+    docker ps
+    docker exec -it tarantool console
+    -- Подключить lua скрипт
+    dofile('/opt/tarantool/init.lua')
+    box.space
+    -- Проверить формат для space
+    box.space.dialogue:format()
+    -- Просмотреть записи в space
+    box.space.dialogue:select()
+    
+```   
+* Проведено нагрузочное тестирование и есть сравнение ДО и ПОСЛЕ
+  * Number of threads 1200 (большее количество при тестировании до использования Tarantool падает с ошибками OutOfMemory)
+  * Call Login API
+  * Call Send dialogue message API for current user and random user
+  * Call Get dialogue messages API for current user and specified user
+* ДО
+  ![Response Time Graph.jpg](tarantool/perf_test/before_tarantool_apply/Response Time Graph.jpg)
+* ПОСЛЕ
+  ![Response Time Graph.jpg](tarantool/perf_test/after_tarantool_apply/Response Time Graph.jpg)
+#### Полезные ссылки
+[Spring Data Tarantool](https://github.com/tarantool/cartridge-springdata/)
+[Tarantool CRUD operations](https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_space/)

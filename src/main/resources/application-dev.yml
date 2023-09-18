@@ -1,3 +1,6 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: otus-app
@@ -18,6 +21,12 @@ spring:
     replicaUrl: jdbc:postgresql://localhost:5432/postgres?useSSL=false&allowPublicKeyRetrieval=true
     username: postgres
     password: postgres
+
+tarantool:
+  host: tarantool
+  port: 3301
+  username: admin
+  password: admin
 
 logging:
   level:

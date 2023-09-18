@@ -38,6 +38,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-integration")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.projectreactor.rabbitmq:reactor-rabbitmq:1.5.6")
+    implementation("io.tarantool:spring-data-tarantool:0.6.0")
     // Not supported with spring-boot-starter-webflux implementation("org.springframework.boot:spring-boot-starter-websocket")
     // DB
     implementation("org.postgresql:postgresql:42.5.4")
