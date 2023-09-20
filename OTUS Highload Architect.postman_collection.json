@@ -684,7 +684,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "\"lala\"",
+							"raw": "Test websocket 12 user part of user {{$randomint }} chris ",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -814,6 +814,89 @@
 			"name": "dialogue",
 			"item": [
 				{
+					"name": "Dialogues Service",
+					"item": [
+						{
+							"name": "[Internal] Send dialogue message Copy",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "PROCESS_ID",
+										"value": "DLG-1",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fromUserId\": \"2\",\r\n    \"toUserId\": \"3\",\r\n    \"text\": \"Message\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{dialogues_service_url}}/internal/dialog/send",
+									"host": [
+										"{{dialogues_service_url}}"
+									],
+									"path": [
+										"internal",
+										"dialog",
+										"send"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Internal] Get dialogue messages for specified users",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "PROCESS_ID",
+										"value": "DLG-1",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstUserId\": \"2\",\r\n    \"secondUserId\": \"3\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{dialogues_service_url}}/internal/dialog/list",
+									"host": [
+										"{{dialogues_service_url}}"
+									],
+									"path": [
+										"internal",
+										"dialog",
+										"list"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Send dialogue message",
 					"request": {
 						"method": "POST",
@@ -826,7 +909,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "\"Hello!\"",
+							"raw": "{\r\n    \"text\": \"Hello! There 4\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -855,6 +938,78 @@
 				},
 				{
 					"name": "Get dialogue messages for current user and specified user",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dialog/:userId/list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dialog",
+								":userId",
+								"list"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[V2] Send dialogue message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\"Hello!\"",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dialogues_service_url}}/v2/dialog/:userId/send",
+							"host": [
+								"{{dialogues_service_url}}"
+							],
+							"path": [
+								"v2",
+								"dialog",
+								":userId",
+								"send"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[V2] Get dialogue messages for current user and specified user",
 					"request": {
 						"method": "GET",
 						"header": [

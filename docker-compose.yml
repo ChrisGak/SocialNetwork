@@ -54,7 +54,6 @@ services:
     depends_on:
       - master
       - rabbitmq
-      - tarantool
     ports:
       - '8080:8080'
     environment:
@@ -65,13 +64,27 @@ services:
                "spring.datasource.replicaUrl": "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
                "spring.rabbitmq.host": "rabbitmq",
                "spring.rabbitmq.port": 5672,
-               "tarantool.host": "tarantool",
-               "tarantool.port": 3301       
+               "otus.dialoguesHost": "http://otus-dialogues-app:8081"       
              }'
     volumes:
       - .m2:/root/.m2
     stdin_open: true
     tty: true
+
+  otus-dialogues-app:
+    image: otus-dialogues-app:latest
+    depends_on:
+      - tarantool
+    ports:
+      - '8081:8081'
+    environment:
+      SPRING_APPLICATION_JSON: '{
+               "spring.datasource.url": "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.r2dbc.url": "r2dbc:pool:postgresql://master/postgres?tlsVersion=TLSv1.2",
+               "spring.datasource.replicaUrl": "jdbc:postgresql://master:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "tarantool.host": "tarantool",
+               "tarantool.port": 3301
+             }'
 
 volumes:
   healthcheck-volume:

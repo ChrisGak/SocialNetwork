@@ -541,3 +541,27 @@ ERROR:  could not find function for data typeId 17254
 #### Полезные ссылки
 [Spring Data Tarantool](https://github.com/tarantool/cartridge-springdata/)
 [Tarantool CRUD operations](https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_space/)
+
+## Домашнее задание #8 Принципы организации микросервисов. Типы взаимодействий
+### Реализован функционал
+* Взаимодействия монолитного сервиса и сервиса чатов реализовать на Rest API или gRPC.
+  * Вынесен модуль otus-dialogues, в котором реализован функционал хранения диалогов в Tarantool
+  * Взаимодействие модулей происходит через REST API
+* Организовать сквозное логирование запросов.
+  * Сквозное логирование обеспечивается с помощью отправки Http Header "PROCESS_ID", который печатается в логах обоих модулей
+* Предусмотреть то, что не все клиенты обновляют приложение быстро и кто-то может ходить через старое API.
+  * Введены REST API
+    * API POST /v2/dialogue/:userId/send - отправка сообщения в диалог
+    * API GET /v2/dialogue/:userId/list - получение диалога между двумя пользователями
+  * Deprecated API - остаются доступными, но внутри переведены на новую логику взаимодействия модулей
+      * POST /dialog/:userId/send - отправка сообщения в диалог
+        ![img_2.png](img_2.png)
+      * GET /dialog/:userId/list - получение диалога между двумя пользователями
+    ![img_3.png](img_3.png)
+#### Важно выполнить шаг из ДЗ№7
+После старта приложения через таску composeUp нужно выполнить dofile('/opt/tarantool/init.lua') для подключения этого скрипта
+``` 
+    docker exec -it tarantool console
+    -- Подключить lua скрипт
+    dofile('/opt/tarantool/init.lua')    
+```   

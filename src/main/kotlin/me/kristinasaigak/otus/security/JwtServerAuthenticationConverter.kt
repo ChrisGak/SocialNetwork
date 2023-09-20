@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono
 
 @Component
 class JwtServerAuthenticationConverter : ServerAuthenticationConverter {
-    override fun convert(exchange: ServerWebExchange?): Mono<Authentication> {
+    override fun convert(exchange: ServerWebExchange): Mono<Authentication> {
         return Mono.justOrEmpty(exchange)
                 .flatMap { Mono.justOrEmpty(it.request.cookies["X-Auth"]) }
                 .filter { it.isNotEmpty() }
