@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="4" author="chrissaigak">
+        <loadData
+                commentLineStartsWith="//"
+                encoding="UTF-8"
+                file="people.csv"
+                quotchar="'"
+                relativeToChangelogFile="true"
+                schemaName="db"
+                separator=";"
+                tableName="users"
+                usePreparedStatements="true">
+            <column index="0"
+                    name="first_name"
+                    type="VARCHAR(255)"/>
+            <column index="1"
+                    name="second_name"
+                    type="VARCHAR(255)"/>
+            <column index="2"
+                    name="age"
+                    type="VARCHAR(255)"/>
+            <column index="3"
+                    name="city"
+                    type="VARCHAR(255)"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

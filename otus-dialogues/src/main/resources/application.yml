@@ -1,0 +1,42 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: otus-dialogues-app
+  liquibase:
+    change-log: ./db/changelog/db.changelog-master.yaml
+    enabled: false
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://master_db:5432/db?autoReconnect=true&useSSL=false&createDatabaseIfNotExist=true
+    driver-class-name: org.postgresql.Driver
+
+  r2dbc:
+    url: r2dbc:pool:postgresql://master_db/db?tlsVersion=TLSv1.2
+    username: postgres
+    password: postgres
+  datasource:
+    url: jdbc:postgresql://master_db:5432/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+    replicaUrl: jdbc:postgresql://replica_db_1:15432/db?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+    username: postgres
+    password: postgres
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+
+tarantool:
+  host: tarantool
+  port: 3301
+  username: admin
+  password: admin
+
+logging:
+  level:
+    org.springframework.jdbc.core: TRACE
+    org.springframework.data.repository: TRACE
+    org.springframework.r2dbc.r2dbc: TRACE
+    liquibase.logLevel: TRACE
+    me.kristinasaigak.otus: DEBUG
+

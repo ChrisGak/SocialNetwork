@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="9_add_third_user_and_friend" author="chrissaigak">
+        <insert tableName="users">
+            <column name="id" value="3"/>
+            <column name="first_name" value="Margery"/>
+            <column name="second_name" value="Tyrell"/>
+            <column name="age" value="28"/>
+            <column name="biography" value="Long story"/>
+            <column name="city" value="High Garden"/>
+            <!-- qwerty-->
+            <column name="password" value="65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5"/>
+        </insert>
+        <insert tableName="friends">
+            <column name="requester_user_id" value="1"/>
+            <column name="accepter_user_id" value="3"/>
+        </insert>
+        <insert tableName="friends">
+            <column name="requester_user_id" value="3"/>
+            <column name="accepter_user_id" value="1"/>
+        </insert>
+        <insert tableName="friends">
+            <column name="requester_user_id" value="2"/>
+            <column name="accepter_user_id" value="3"/>
+        </insert>
+        <insert tableName="friends">
+            <column name="requester_user_id" value="3"/>
+            <column name="accepter_user_id" value="2"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
