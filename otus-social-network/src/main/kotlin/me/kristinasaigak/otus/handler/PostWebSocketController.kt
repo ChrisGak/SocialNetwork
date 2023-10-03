@@ -1,7 +1,10 @@
 package me.kristinasaigak.otus.handler
 
 import me.kristinasaigak.otus.service.RabbitQueueService
+import me.kristinasaigak.otus.utils.MetricTag
+import me.kristinasaigak.otus.utils.MetricTitle
 import me.kristinasaigak.otus.utils.getCurrentUserId
+import me.kristinasaigak.otus.utils.metric
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.socket.WebSocketHandler
@@ -30,4 +33,5 @@ class PostWebSocketController(private val rabbitQueueService: RabbitQueueService
                                     }
                                 }
                     }
+                    .metric(MetricTitle.WEBSOCKET_REQUEST_HANDLE.value, MetricTag.URL.value, "/post/feed/posted")
 }

@@ -3,6 +3,7 @@ package me.kristinasaigak.otus.handler
 import me.kristinasaigak.otus.model.dto.PostDto
 import me.kristinasaigak.otus.service.PostService
 import me.kristinasaigak.otus.utils.RequestParams
+import me.kristinasaigak.otus.utils.metricHandledRequest
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -29,6 +30,7 @@ class PostHandler(
                 } else
                     ServerResponse.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).build()
             }
+                    .metricHandledRequest("/post/get")
 
     fun createPost(request: ServerRequest): Mono<ServerResponse> =
             request.bodyToMono(String::class.java).let {
@@ -36,6 +38,7 @@ class PostHandler(
                         .flatMap {
                             ServerResponse.status(HttpStatus.CREATED).build()
                         }
+                        .metricHandledRequest("/post/create")
             }
 
     /**
@@ -57,18 +60,19 @@ class PostHandler(
                                 PostDto(postId = it.id.toString(), postText = it.text, author_user_id = it.authorUserId.toString())
                             }
                     )
+                    .metricHandledRequest("/post/feed")
         }
     }
 
-    fun removePost(request: ServerRequest): Mono<ServerResponse> {
-        request.queryParam(RequestParams.ID.value).let { postId ->
-            return if (postId.isPresent) {
-                postService.deletePost(postId.get().toInt()).flatMap {
-                    ServerResponse.ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue("Успешно удален пост")
-                }
-            } else ServerResponse.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).build()
-        }
-    }
+    fun removePost(request: ServerRequest): Mono<ServerResponse> =
+            request.queryParam(RequestParams.ID.value).let { postId ->
+                return if (postId.isPresent) {
+                    postService.deletePost(postId.get().toInt()).flatMap {
+                        ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue("Успешно удален пост")
+                    }
+                            .metricHandledRequest("/post/delete")
+                } else ServerResponse.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).build()
+            }
 }

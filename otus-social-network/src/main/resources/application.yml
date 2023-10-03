@@ -43,3 +43,27 @@ logging:
 otus:
   dialoguesHost: http://otus-dialogues-app:8081
 
+management:
+  endpoints:
+    enabled-by-default: true
+    web.exposure.include: '*'
+  endpoint:
+    prometheus.enabled: true
+    env.enabled: true
+    configprops.enabled: true
+    info.enabled: true
+    loggers.enabled: true
+    metrics.enabled: true
+    threaddump.enabled: true
+    health:
+      enabled: true
+      show-details: always
+  metrics:
+    distribution:
+      percentiles:
+        "[http.server.requests]": 0.75, 0.95, 0.99
+        "[otus.request.handled]": 0.75, 0.95, 0.99
+      percentiles-histogram:
+        "[http.server.requests]": true
+        "[otus.request.handled]": true
+
