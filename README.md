@@ -566,6 +566,9 @@ ERROR:  could not find function for data typeId 17254
     dofile('/opt/tarantool/init.lua')    
 ```   
 
+## Домашнее задание #11 Сервис счетчиков
+### Реализован функционал
+
 ## Домашнее задание #12 Мониторинг
 RED method для сервисов:
 * Rate - количество запросов в секунду
