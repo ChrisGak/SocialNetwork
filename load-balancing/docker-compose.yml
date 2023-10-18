@@ -1,0 +1,197 @@
+version: '3.9'
+
+services:
+  master_db:
+    image: ${POSTGRES_IMAGE}
+    container_name: master_db
+    volumes:
+      #- master_db:/var/lib/postgresql/data
+      - ./master_db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./master_db/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./master_db/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports: # <Port exposed> : <Port running inside container>
+      - '5432:5432'
+    networks:
+      - otus_network
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $DATABASE
+
+  master_db_2:
+    image: ${POSTGRES_IMAGE}
+    container_name: master_db_2
+    volumes:
+      - master_db:/var/lib/postgresql/data
+    ports: # <Port exposed> : <Port running inside container>
+      - '45432:45432'
+    networks:
+      - otus_network
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $DATABASE
+
+  replica_db_1:
+    image: ${POSTGRES_IMAGE}
+    container_name: replica_db_1
+    depends_on:
+      - master_db
+    volumes:
+      - replica_db_1:/var/lib/postgresql/data
+      - ./replica_db_1/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./replica_db_1/standby.signal:/etc/postgresql/standby.signal
+    ports:
+      - '15432:5432'
+    networks:
+      - otus_network
+    environment:
+      POSTGRES_PASSWORD: $REPLICATION_POSTGRES_PASSWORD
+      POSTGRES_DB: $DATABASE
+
+  replica_db_2:
+    image: ${POSTGRES_IMAGE}
+    container_name: replica_db_2
+    depends_on:
+      - master_db
+    volumes:
+      - replica_db_2:/var/lib/postgresql/data
+      - ./replica_db_2/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./replica_db_2/standby.signal:/etc/postgresql/standby.signal
+    ports:
+      - '25432:5432'
+    networks:
+      - otus_network
+    environment:
+      POSTGRES_PASSWORD: $REPLICATION_POSTGRES_PASSWORD
+      POSTGRES_DB: $DATABASE
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      # Admin http://localhost:15672/ guest / guest
+    networks:
+      - otus_network
+
+  tarantool:
+    image: tarantool/tarantool:latest
+    container_name: "tarantool"
+    ports:
+      - "3301:3301"
+    volumes:
+      - ../tarantool/conf/init.lua:/opt/tarantool/init.lua
+      - ../tarantool/data:/var/lib/tarantool
+    networks:
+      - otus_network
+
+  otus-app-1:
+    image: otus-app:latest
+    container_name: "otus-app-1"
+    restart: "no"
+    depends_on:
+      - master_db
+      - rabbitmq
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+               "server.port": 8082,
+               "spring.liquibase.url": "jdbc:postgresql://master_db:5432/postgres?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
+               "spring.datasource.url": "jdbc:postgresql://master_db:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.r2dbc.url": "r2dbc:pool:postgresql://master_db/postgres?tlsVersion=TLSv1.2",
+               "spring.datasource.replicaUrl": "jdbc:postgresql://master_db:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.rabbitmq.host": "rabbitmq",
+               "spring.rabbitmq.port": 5672,
+               "otus.dialoguesHost": "http://otus-dialogues-app:8081"       
+             }'
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+    networks:
+      - otus_network
+
+  otus-app-2:
+    image: otus-app:latest
+    container_name: "otus-app-2"
+    restart: "no"
+    depends_on:
+      - master_db
+      - rabbitmq
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+              "server.port": 8083,
+              "spring.liquibase.url": "jdbc:postgresql://master_db:5432/postgres?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
+              "spring.datasource.url": "jdbc:postgresql://master_db:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+              "spring.r2dbc.url": "r2dbc:pool:postgresql://master_db/postgres?tlsVersion=TLSv1.2",
+              "spring.datasource.replicaUrl": "jdbc:postgresql://master_db:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+              "spring.rabbitmq.host": "rabbitmq",
+              "spring.rabbitmq.port": 5672,
+              "otus.dialoguesHost": "http://otus-dialogues-app:8081"       
+            }'
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+    networks:
+      - otus_network
+
+  otus-dialogues-app:
+    image: otus-dialogues-app:latest
+    container_name: "otus-dialogues-app"
+    depends_on:
+      - tarantool
+    ports:
+      - '8081:8081'
+    environment:
+      SPRING_APPLICATION_JSON: '{
+               "spring.datasource.url": "jdbc:postgresql://master_db:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "spring.r2dbc.url": "r2dbc:pool:postgresql://master_db/postgres?tlsVersion=TLSv1.2",
+               "spring.datasource.replicaUrl": "jdbc:postgresql://master_db:5432/postgres?useSSL=false&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true",
+               "tarantool.host": "tarantool",
+               "tarantool.port": 3301
+             }'
+    networks:
+      - otus_network
+
+  nginx:
+    image: nginx:1.21
+    container_name: nginx-otus
+    restart: on-failure
+    networks:
+      - otus_network
+    volumes:
+      - "./nginx/default.conf:/etc/nginx/conf.d/default.conf"
+    ports:
+      - "4087:80"
+      - "4097:8080"
+
+  haproxy:
+    image: haproxy:2.4
+    container_name: haproxy-lb
+    restart: "no"
+    networks:
+      - otus_network
+    volumes:
+      - "./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
+    ports:
+      - "4080:80"
+      - "8404:8404"
+
+volumes:
+  master_db:
+  replica_db_1:
+  replica_db_2:
+
+networks:
+  otus_network:
+    name: otus_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.19.0.0/16"

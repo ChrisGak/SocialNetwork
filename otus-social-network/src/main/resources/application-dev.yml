@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8084
 
 spring:
   application:
@@ -32,7 +32,7 @@ logging:
 
 management:
   server:
-    port: 8082
+    port: 8084
   endpoints:
     web:
       exposure:
