@@ -1,0 +1,4 @@
+2023-10-20 21:20:35 [WARNING]  (1) : Current worker #1 (8) exited with code 0 (Exit)
+2023-10-20 21:20:35 [WARNING]  (1) : All workers exited. Exiting... (0)
+2023-10-20 21:20:36 [NOTICE]   (1) : New worker #1 (8) forked
+2023-10-20 21:23:04 [WARNING]  (8) : Server nodes/replica_db_1 is DOWN, reason: Layer4 timeout, check duration: 1001ms. 2 active and 0 backup servers left. 0 sessions active, 0 requeued, 0 remaining in queue.

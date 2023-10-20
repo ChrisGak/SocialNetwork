@@ -565,6 +565,59 @@ ERROR:  could not find function for data typeId 17254
     -- Подключить lua скрипт
     dofile('/opt/tarantool/init.lua')    
 ```   
+## Домашнее задание #10 Балансировка и отказоустойчивость
+### Задание
+#### HTTP-балансировка с помощью NGINX
+* Поднять несколько приложений и обеспечить их балансировку через nginx.
+    * [nginx](https://nginx.org/ru/) - это HTTP-сервер и обратный прокси-сервер, почтовый прокси-сервер, а также TCP/UDP
+      прокси-сервер общего назначения. Позволяет настроить HTTP балансировку
+    * [docker-compose](load-balancing/docker-compose.yml) с запуском бэкендов и nginx
+    * Конфигурация [nginx.conf](load-balancing/nginx/default.conf)
+    * Как проверить, что конфигурация nginx корректная
+  ``` 
+      docker exec -it nginx-otus nginx -t
+  ```
+  ![img_4.png](load-balancing/screenshots/img_4.png)
+   ``` 
+       Команда для перечитывания конфигурации
+       docker exec -it nginx-otus nginx -s reload
+  ```
+  ![Пример, когда указанный сервис не поднят](load-balancing/screenshots/img.png)
+    * [Статистика Nginx](http://localhost:4097/nginx_status)
+      ![nginx_status](load-balancing/screenshots/img_1.png)
+#### TCP-балансировка с помощью HAPROXY
+* HAPROXY Поддерживает балансировку TCP и UDP трафика
+* Поднять несколько слейвов PostgreSQL
+    * [docker-compose](load-balancing/docker-compose.yml)  с запуском бэкендов, PostgreSQL и haproxy
+    * скрипт запуска и настройки репликации [start.sh](tcp-haproxy/start.sh)
+    * Конфигурация [haproxy.cfg](load-balancing/haproxy/haproxy.cfg)
+* Реализовать соединение со слейвами PostgreSQL через haproxy.
+* [Статистика Haproxy](localhost:8404/stats)
+
+#### Воспроизвести нагрузку.
+* Под нагрузкой с помощью "kill -9" отключить один из инстансов бэкенда. Убедится, что система осталась работоспособной.
+Отключу инстанс бэкенда с помощью docker stop
+ ``` 
+      docker stop otus-app-1
+  ```
+* Статистика nginx после отключения одного из инстансов бэкенда ![Статистика](load-balancing/screenshots/img_2.png)
+* Статистика Haproxy ![Статистика](load-balancing/screenshots/img_3.png)
+* Под нагрузкой с помощью "kill -9" отключить один из слейвов PostgreSQL. Убедится, что система осталась
+  работоспособной.
+ ``` 
+      docker stop replica_db_1
+  ```
+![Система с отключенной репликой PostgreSQL](load-balancing/screenshots/img_5.png)
+* Статистика Haproxy после отключения реплики БД ![Статистика](load-balancing/screenshots/img_6.png)
+* [Как установить Apache Benchmark](https://www.cedric-dumont.com/2017/02/01/install-apache-benchmarking-tool-ab-on-windows/)
+ ``` 
+    cd <Path to bin/ab.exe>
+    ab -n 10000 -c 300 http://localhost:4080/
+  ```
+![Результаты работы команды ab](load-balancing/screenshots/img_7.png)
+![Логи работы Haproxy](load-balancing/haproxy.logs)
+#### Примеры из лекции [balancing_and_ha_example](load-balancing/balancing_and_ha_example)
+
 
 ## Домашнее задание #12 Мониторинг
 RED method для сервисов:

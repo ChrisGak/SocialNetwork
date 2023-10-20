@@ -37,7 +37,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.projectreactor.rabbitmq:reactor-rabbitmq:1.5.6")
     implementation("io.tarantool:spring-data-tarantool:0.6.0")
-    // Not supported with spring-boot-starter-webflux implementation("org.springframework.boot:spring-boot-starter-websocket")
     // DB
     implementation("org.postgresql:postgresql:42.5.4")
     implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
@@ -86,7 +85,7 @@ tasks.withType<Test> {
 docker {
     springBootApplication {
         baseImage.set("openjdk:17-jdk-slim")
-        ports.set(listOf(9090, 8080))
+        // ports.set(listOf(9090, 8080))
         images.set(setOf("otus-app:1.0", "otus-app:latest"))
         jvmArgs.set(listOf("-Dspring.profiles.active=default", "-Xmx2048m"))
     }
