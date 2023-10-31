@@ -10,6 +10,7 @@ import me.kristinasaigak.otus.utils.generateProcessId
 import me.kristinasaigak.otus.utils.getCurrentUserId
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono

@@ -1,7 +1,7 @@
 package me.kristinasaigak.otus.security
 
 import me.kristinasaigak.otus.model.security.Role
-import me.kristinasaigak.otus.service.impl.JwtSigner
+import me.kristinasaigak.otus.service.JwtSigner
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken

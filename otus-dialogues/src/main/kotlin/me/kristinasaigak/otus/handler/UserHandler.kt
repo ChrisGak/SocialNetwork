@@ -3,8 +3,8 @@ package me.kristinasaigak.otus.handler
 import lombok.RequiredArgsConstructor
 import me.kristinasaigak.otus.model.security.AuthRequest
 import me.kristinasaigak.otus.model.security.AuthResponse
-import me.kristinasaigak.otus.service.JwtSigner
-import me.kristinasaigak.otus.service.UserService
+import me.kristinasaigak.otus.service.impl.JwtSigner
+import me.kristinasaigak.otus.service.impl.UserService
 import me.kristinasaigak.otus.utils.hash
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus

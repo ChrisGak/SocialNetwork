@@ -619,6 +619,17 @@ ERROR:  could not find function for data typeId 17254
 #### Примеры из лекции [balancing_and_ha_example](load-balancing/balancing_and_ha_example)
 
 
+## Домашнее задание #11 Сервис счетчиков
+### Реализован функционал
+# Разработайте сервис счетчиков - otus-counter-app
+Добавлены API в папку Counter Service 
+![img.png](counter%2Fimg.png)
+# Продумайте, как обеспечить консистентность между счетчиком и реальным числом непрочитанных сообщений. Например, используйте паттерн SAGA.
+При создании сообщения, используя модуль otus-dialogues-app, происходит вызов компенсируемой операции (increment counter), а в случае ошибки - выполняется компенсирующая операция (decrement counter)
+Ошибку можно получить в случае, когда поднят модуль otus-dialogues-app, но не выполнены скрипты инициализации для Tarantool.
+![img_2.png](counter%2Fimg_2.png)
+![img_1.png](counter%2Fimg_1.png)
+
 ## Домашнее задание #12 Мониторинг
 RED method для сервисов:
 * Rate - количество запросов в секунду

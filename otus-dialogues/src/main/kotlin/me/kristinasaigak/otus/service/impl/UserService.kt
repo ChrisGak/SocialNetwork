@@ -1,4 +1,4 @@
-package me.kristinasaigak.otus.service
+package me.kristinasaigak.otus.service.impl
 
 import me.kristinasaigak.otus.model.entity.User
 import me.kristinasaigak.otus.repository.UserReplicaRepository
