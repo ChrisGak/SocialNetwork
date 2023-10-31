@@ -46,6 +46,10 @@ class DialogueHandler(
                                         ServerResponse.status(HttpStatus.CREATED).build()
                                 )
                     }
+                    .onErrorResume {
+                        logger.error("Error received from Dialogues module: ${it.message}")
+                        ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+                    }
                     .metricHandledRequest("/v2/dialogue/{userId}/send")
 
     @Deprecated("Use me.kristinasaigak.otus.handler.DialogueHandler#getDialogueV2 instead")
@@ -75,6 +79,10 @@ class DialogueHandler(
                                     .bodyValue(
                                             dialogueMessages
                                     )
+                        }
+                        .onErrorResume {
+                            logger.error("Error received from Dialogues module: ${it.message}")
+                            ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
                         }
                         .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_FOUND).build())
             }

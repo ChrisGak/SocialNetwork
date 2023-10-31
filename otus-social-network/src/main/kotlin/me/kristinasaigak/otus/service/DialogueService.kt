@@ -2,6 +2,7 @@ package me.kristinasaigak.otus.service
 
 import me.kristinasaigak.otus.model.dto.DialogueMessageDto
 import me.kristinasaigak.otus.model.dto.DialogueMessageRequest
+import org.springframework.web.reactive.function.client.ClientResponse
 import reactor.core.publisher.Mono
 
 interface DialogueService {

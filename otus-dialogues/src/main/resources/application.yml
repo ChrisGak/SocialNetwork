@@ -66,3 +66,6 @@ management:
         "[otus.dialogue.send-message.handled]": true
         "[otus.dialogue.get-messages.handled]": true
 
+otus:
+  counterServiceHost: http://otus-counter-app:8083
+

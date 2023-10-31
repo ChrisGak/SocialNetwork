@@ -1,16 +1,17 @@
-package me.kristinasaigak.otus.service
+package me.kristinasaigak.otus.service.impl
 
 import me.kristinasaigak.otus.model.dto.DialogueMessageDto
 import me.kristinasaigak.otus.model.dto.DialogueMessageRequest
 import me.kristinasaigak.otus.model.dto.GetDialogueRequest
 import me.kristinasaigak.otus.repository.tarantool.TarantoolDialogueRepository
+import me.kristinasaigak.otus.service.DialogueService
 import me.kristinasaigak.otus.utils.toIntOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class TarantoolDialogueServiceImpl(
-        private val dialogueRepository: TarantoolDialogueRepository,
+        private val dialogueRepository: TarantoolDialogueRepository
 ) : DialogueService {
 
     private val logger = LoggerFactory.getLogger(javaClass)

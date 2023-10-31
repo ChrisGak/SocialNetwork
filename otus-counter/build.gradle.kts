@@ -67,7 +67,7 @@ tasks.getByName<Test>("test") {
 docker {
     springBootApplication {
         baseImage.set("openjdk:17-jdk-slim")
-        ports.set(listOf(9093, 8083))
+        ports.set(listOf(8083, 8083))
         images.set(setOf("otus-counter-app:1.0", "otus-counter-app:latest"))
         jvmArgs.set(listOf("-Dspring.profiles.active=default", "-Xmx2048m"))
     }

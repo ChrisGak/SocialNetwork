@@ -22,8 +22,8 @@ class SecurityConfig {
         return http
                 .csrf().disable()
                 .authorizeExchange()
-                .pathMatchers("/login").permitAll()
-                .pathMatchers("/actuator/**").permitAll()
+                // .pathMatchers("/login").permitAll()
+                // .pathMatchers("/actuator/**").permitAll()
                 //.anyExchange().authenticated()
                 .anyExchange().permitAll()
                 .and()

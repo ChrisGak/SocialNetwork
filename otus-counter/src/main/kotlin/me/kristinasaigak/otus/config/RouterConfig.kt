@@ -19,5 +19,6 @@ class RouterConfig(
         return route(
                 POST("/internal/dialogue/counter/increment").and(accept(MediaType.APPLICATION_JSON)), counterHandler::incrementCounter)
                 .andRoute(POST("/internal/dialogue/counter/decrement").and(accept(MediaType.APPLICATION_JSON)), counterHandler::decrementCounter)
+                .andRoute(POST("/internal/dialogue/counter").and(accept(MediaType.APPLICATION_JSON)), counterHandler::getCounter)
     }
 }

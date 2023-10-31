@@ -1,4 +1,4 @@
-package me.kristinasaigak.otus.service
+package me.kristinasaigak.otus.service.impl
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
